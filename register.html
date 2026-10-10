@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abrir conta | NU Empréstimo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nu: { 50:'#F5F0FF',100:'#EDE5FF',200:'#D9C7FF',400:'#A855F7',500:'#9333EA',600:'#820AD1',700:'#6B00B3',800:'#580A8F',900:'#3B0764' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F7F7F8] min-h-screen flex flex-col antialiased font-sans">
+  <nav class="nu-nav">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-nu-600 to-nu-800 flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-nu-600/25 tracking-tighter">NU</div>
+        <span class="text-[17px] font-bold tracking-tight text-slate-900">Empréstimo</span>
+      </a>
+      <a href="login.html" class="text-[13.5px] font-semibold text-nu-600 hover:text-nu-700">Já tenho conta</a>
+    </div>
+  </nav>
+
+  <main class="flex-1 flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-lg">
+
+      <!-- Formulário -->
+      <div id="formCard" class="bg-white rounded-[1.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold text-slate-900">Abrir sua conta</h1>
+          <p class="mt-2 text-slate-500 text-[14px]">Cadastro com CPF, e-mail e WhatsApp · confirmação por e-mail</p>
+        </div>
+
+        <form id="registerForm" class="space-y-5" novalidate>
+          <div>
+            <label for="name" class="block text-[13px] font-medium text-slate-600 mb-1.5">Nome completo</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
+              <input type="text" id="name" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none transition bg-slate-50/50" placeholder="Seu nome completo" />
+            </div>
+            <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
+          </div>
+
+          <div>
+            <label for="cpf" class="block text-[13px] font-medium text-slate-600 mb-1.5">CPF</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-id-card text-sm"></i></span>
+              <input type="text" id="cpf" required maxlength="14" class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none transition bg-slate-50/50" placeholder="000.000.000-00" />
+            </div>
+            <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
+          </div>
+
+          <div>
+            <label for="email" class="block text-[13px] font-medium text-slate-600 mb-1.5">E-mail</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
+              <input type="email" id="email" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none transition bg-slate-50/50" placeholder="seu@email.com" />
+            </div>
+            <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
+          </div>
+
+          <div>
+            <label for="whatsapp" class="block text-[13px] font-medium text-slate-600 mb-1.5">WhatsApp</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fab fa-whatsapp"></i></span>
+              <input type="tel" id="whatsapp" required maxlength="15" class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none transition bg-slate-50/50" placeholder="(11) 99999-9999" />
+            </div>
+            <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="password" class="block text-[13px] font-medium text-slate-600 mb-1.5">Senha</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-lock text-sm"></i></span>
+                <input type="password" id="password" required minlength="6" class="w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none transition bg-slate-50/50" placeholder="Mín. 6 caracteres" />
+                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 toggle-password" data-target="password"><i class="fas fa-eye text-sm"></i></button>
+              </div>
+              <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
+            </div>
+            <div>
+              <label for="passwordConfirm" class="block text-[13px] font-medium text-slate-600 mb-1.5">Confirmar senha</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-lock text-sm"></i></span>
+                <input type="password" id="passwordConfirm" required minlength="6" class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none transition bg-slate-50/50" placeholder="Repita a senha" />
+              </div>
+              <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="terms" required class="mt-1 rounded border-slate-300 text-nu-600 focus:ring-nu-500" />
+            <label for="terms" class="text-[13px] text-slate-500 leading-relaxed">
+              Li e aceito os <a href="#" class="text-nu-600 hover:underline">Termos de Uso</a> e a <a href="#" class="text-nu-600 hover:underline">Política de Privacidade</a>. Autorizo o tratamento dos meus dados conforme a LGPD.
+            </label>
+          </div>
+          <p class="error-msg-terms hidden text-red-500 text-xs"></p>
+          <p id="apiError" class="hidden text-red-500 text-sm text-center"></p>
+
+          <button type="submit" id="submitBtn" class="nu-btn-primary w-full text-[15px] py-3.5 flex items-center justify-center gap-2">
+            Criar minha conta
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-[13.5px] text-slate-500">
+          Já possui conta?
+          <a href="login.html" class="text-nu-600 font-semibold hover:text-nu-700">Entrar</a>
+        </div>
+      </div>
+
+      <!-- Sucesso: verifique o e-mail -->
+      <div id="successCard" class="hidden bg-white rounded-[1.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-nu-100 text-nu-600 flex items-center justify-center text-3xl mx-auto mb-5">
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900">Verifique seu e-mail</h1>
+        <p class="mt-3 text-slate-500 text-[14.5px] leading-relaxed">
+          Enviamos um link de confirmação para<br>
+          <strong class="text-slate-800" id="sentEmail">—</strong>
+        </p>
+        <p class="mt-4 text-[13px] text-slate-400">
+          Clique no link do e-mail para ativar sua conta. O link expira em 24 horas.
+        </p>
+
+        <!-- Modo simulado (sem chave Brevo) -->
+        <div id="simulatedBox" class="hidden mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-left">
+          <p class="text-[12px] font-semibold text-amber-800 mb-2"><i class="fas fa-flask mr-1"></i> Modo simulado (Brevo não configurado)</p>
+          <p class="text-[12px] text-amber-700 mb-3">Use o link abaixo para confirmar:</p>
+          <a id="simulatedLink" href="#" class="text-[12px] text-nu-600 break-all font-medium hover:underline"></a>
+        </div>
+
+        <button id="resendBtn" class="mt-6 text-[13.5px] font-semibold text-nu-600 hover:text-nu-700">
+          Não recebeu? Reenviar e-mail
+        </button>
+        <p id="resendMsg" class="hidden mt-2 text-[12px] text-emerald-600"></p>
+
+        <div class="mt-8">
+          <a href="login.html" class="text-[13.5px] text-slate-500 hover:text-slate-700">Já confirmei · Ir para login</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    const API = window.location.origin.includes('3000') || window.location.protocol.startsWith('http')
+      ? window.location.origin
+      : 'http://localhost:3000';
+
+    // Se abriu o HTML direto (file://), aponta para o servidor
+    const apiBase = (window.location.protocol === 'file:') ? 'http://localhost:3000' : window.location.origin;
+
+    document.getElementById('cpf').addEventListener('input', function(e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      e.target.value = v;
+    });
+    document.getElementById('whatsapp').addEventListener('input', function(e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 0) v = '(' + v;
+      if (v.length > 3) v = v.slice(0, 3) + ') ' + v.slice(3);
+      if (v.length > 10) v = v.slice(0, 10) + '-' + v.slice(10);
+      e.target.value = v;
+    });
+
+    let registeredEmail = '';
+
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearErrors(this);
+      document.querySelector('.error-msg-terms')?.classList.add('hidden');
+      document.getElementById('apiError').classList.add('hidden');
+
+      const name = document.getElementById('name').value.trim();
+      const cpf = document.getElementById('cpf').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+      const password = document.getElementById('password').value;
+      const passwordConfirm = document.getElementById('passwordConfirm').value;
+      const terms = document.getElementById('terms').checked;
+      let valid = true;
+
+      if (name.length < 3) { showError(document.getElementById('name'), 'Informe seu nome completo'); valid = false; }
+      if (!validateCPF(cpf)) { showError(document.getElementById('cpf'), 'CPF inválido'); valid = false; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError(document.getElementById('email'), 'E-mail inválido'); valid = false; }
+      const wa = whatsapp.replace(/\D/g, '');
+      if (wa.length < 10 || wa.length > 11) { showError(document.getElementById('whatsapp'), 'WhatsApp inválido'); valid = false; }
+      if (password.length < 6) { showError(document.getElementById('password'), 'Mínimo 6 caracteres'); valid = false; }
+      if (password !== passwordConfirm) { showError(document.getElementById('passwordConfirm'), 'As senhas não coincidem'); valid = false; }
+      if (!terms) {
+        document.querySelector('.error-msg-terms').textContent = 'Você precisa aceitar os termos';
+        document.querySelector('.error-msg-terms').classList.remove('hidden');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
+
+      try {
+        const res = await fetch(apiBase + '/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, cpf, email, whatsapp, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          document.getElementById('apiError').textContent = data.error || 'Erro ao criar conta';
+          document.getElementById('apiError').classList.remove('hidden');
+          btn.disabled = false;
+          btn.innerHTML = 'Criar minha conta';
+          return;
+        }
+
+        registeredEmail = data.email || email;
+        document.getElementById('formCard').classList.add('hidden');
+        document.getElementById('successCard').classList.remove('hidden');
+        document.getElementById('sentEmail').textContent = registeredEmail;
+
+        // Modo simulado: mostra o link
+        if (data.simulated && data.verificationToken) {
+          const link = apiBase + '/verify.html?token=' + data.verificationToken;
+          document.getElementById('simulatedBox').classList.remove('hidden');
+          const a = document.getElementById('simulatedLink');
+          a.href = link;
+          a.textContent = link;
+        }
+      } catch (err) {
+        document.getElementById('apiError').textContent =
+          'Não foi possível conectar ao servidor. Rode o backend (npm start na pasta server) e tente de novo.';
+        document.getElementById('apiError').classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = 'Criar minha conta';
+      }
+    });
+
+    document.getElementById('resendBtn').addEventListener('click', async function() {
+      if (!registeredEmail) return;
+      this.disabled = true;
+      this.textContent = 'Enviando...';
+      try {
+        const res = await fetch(apiBase + '/api/resend-verification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: registeredEmail })
+        });
+        const data = await res.json();
+        const msg = document.getElementById('resendMsg');
+        msg.classList.remove('hidden');
+        if (res.ok) {
+          msg.textContent = 'E-mail reenviado! Confira sua caixa de entrada.';
+          msg.classList.remove('text-red-500');
+          msg.classList.add('text-emerald-600');
+          if (data.simulated && data.verificationToken) {
+            const link = apiBase + '/verify.html?token=' + data.verificationToken;
+            document.getElementById('simulatedBox').classList.remove('hidden');
+            const a = document.getElementById('simulatedLink');
+            a.href = link;
+            a.textContent = link;
+          }
+        } else {
+          msg.textContent = data.error || 'Falha ao reenviar';
+          msg.classList.add('text-red-500');
+        }
+      } catch {
+        document.getElementById('resendMsg').textContent = 'Erro de conexão';
+        document.getElementById('resendMsg').classList.remove('hidden');
+      }
+      this.disabled = false;
+      this.textContent = 'Não recebeu? Reenviar e-mail';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin | NU Empréstimo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nu: { 50:'#F5F0FF',100:'#EDE5FF',200:'#D9C7FF',400:'#A855F7',500:'#9333EA',600:'#820AD1',700:'#6B00B3',800:'#580A8F',900:'#3B0764' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F7F7F8] min-h-screen antialiased font-sans">
+  <nav class="bg-slate-900 text-white sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-nu-600 flex items-center justify-center text-white font-extrabold text-sm tracking-tighter shadow">NU</div>
+          <div>
+            <span class="font-bold text-[15px]">Empréstimo</span>
+            <span class="text-[10px] bg-amber-400 text-slate-900 font-bold px-2 py-0.5 rounded ml-2 uppercase tracking-wide">Admin</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="dashboard.html" class="text-[13px] text-slate-400 hover:text-white transition hidden sm:inline"><i class="fas fa-user mr-1"></i> Cliente</a>
+          <a href="index.html" class="text-[13px] text-slate-400 hover:text-white transition hidden sm:inline"><i class="fas fa-home mr-1"></i> Site</a>
+          <button id="logoutBtn" class="text-[13px] font-medium text-slate-400 hover:text-red-400 flex items-center gap-1.5 transition">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl sm:text-[1.75rem] font-extrabold tracking-tight text-slate-900">Painel Administrativo</h1>
+      <p class="text-slate-500 mt-1 text-[14px]">Gerencie usuários e solicitações de empréstimo</p>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="nu-card p-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-nu-100 text-nu-600 flex items-center justify-center"><i class="fas fa-users"></i></div>
+          <div>
+            <p class="text-[11px] text-slate-400 uppercase">Usuários</p>
+            <p class="text-xl font-bold text-slate-900" id="statUsers">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="nu-card p-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>
+          <div>
+            <p class="text-[11px] text-slate-400 uppercase">Solicitações</p>
+            <p class="text-xl font-bold text-slate-900" id="statLoans">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="nu-card p-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fas fa-hourglass-half"></i></div>
+          <div>
+            <p class="text-[11px] text-slate-400 uppercase">Em análise</p>
+            <p class="text-xl font-bold text-slate-900" id="statPending">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="nu-card p-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
+          <div>
+            <p class="text-[11px] text-slate-400 uppercase">Aprovadas</p>
+            <p class="text-xl font-bold text-slate-900" id="statApproved">0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-1 mb-6 border-b border-slate-200">
+      <button class="tab-btn active px-5 py-3 text-[13.5px] font-semibold text-nu-600 border-b-2 border-nu-600 -mb-px" data-tab="loans">
+        <i class="fas fa-file-invoice-dollar mr-1.5"></i> Solicitações
+      </button>
+      <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="users">
+        <i class="fas fa-users mr-1.5"></i> Usuários
+      </button>
+    </div>
+
+    <div id="tab-loans" class="tab-content">
+      <div class="nu-card overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 class="font-bold text-slate-900 text-[15px]">Todas as solicitações</h2>
+          <select id="filterStatus" class="text-[13px] border border-slate-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-nu-500/30 bg-white">
+            <option value="all">Todos os status</option>
+            <option value="em_analise">Em análise</option>
+            <option value="aprovado">Aprovado</option>
+            <option value="recusado">Recusado</option>
+            <option value="pago">Pago</option>
+          </select>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-[13.5px]">
+            <thead class="bg-slate-50 text-slate-400 text-left text-[12px] uppercase tracking-wider">
+              <tr>
+                <th class="px-6 py-3 font-medium">Cliente</th>
+                <th class="px-6 py-3 font-medium">Valor</th>
+                <th class="px-6 py-3 font-medium">Parcelas</th>
+                <th class="px-6 py-3 font-medium">Data</th>
+                <th class="px-6 py-3 font-medium">Status</th>
+                <th class="px-6 py-3 font-medium">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="loansTable" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div id="loansEmpty" class="hidden px-6 py-12 text-center text-slate-400">
+          <i class="fas fa-inbox text-2xl mb-3"></i>
+          <p class="text-[14px]">Nenhuma solicitação encontrada</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-users" class="tab-content hidden">
+      <div class="nu-card overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <h2 class="font-bold text-slate-900 text-[15px]">Usuários cadastrados</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-[13.5px]">
+            <thead class="bg-slate-50 text-slate-400 text-left text-[12px] uppercase tracking-wider">
+              <tr>
+                <th class="px-6 py-3 font-medium">Nome</th>
+                <th class="px-6 py-3 font-medium">CPF</th>
+                <th class="px-6 py-3 font-medium">E-mail</th>
+                <th class="px-6 py-3 font-medium">WhatsApp</th>
+                <th class="px-6 py-3 font-medium">Perfil</th>
+                <th class="px-6 py-3 font-medium">Cadastro</th>
+                <th class="px-6 py-3 font-medium">Solicitações</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="statusModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
+      <h3 class="font-bold text-lg text-slate-900 mb-2" id="modalTitle">Alterar status</h3>
+      <p class="text-[14px] text-slate-500 mb-6" id="modalDesc"></p>
+      <div class="flex gap-3">
+        <button id="modalCancel" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium text-[14px] hover:bg-slate-50 transition">Cancelar</button>
+        <button id="modalConfirm" class="flex-1 px-4 py-2.5 rounded-xl bg-nu-600 text-white font-medium text-[14px] hover:bg-nu-700 transition">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!requireAdmin()) {}
+
+    const session = getSession();
+    let pendingAction = null;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active', 'text-nu-600', 'border-nu-600');
+          b.classList.add('text-slate-400', 'border-transparent');
+        });
+        btn.classList.add('active', 'text-nu-600', 'border-nu-600');
+        btn.classList.remove('text-slate-400', 'border-transparent');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+      });
+    });
+
+    function getAllData() {
+      const users = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+      const allLoans = [];
+      users.forEach(u => {
+        (u.loans || []).forEach(loan => {
+          allLoans.push({ ...loan, userId: u.id, userName: u.name, userEmail: u.email, userWhatsapp: u.whatsapp, userCpf: u.cpf });
+        });
+      });
+      return { users, allLoans };
+    }
+
+    function updateStats() {
+      const { users, allLoans } = getAllData();
+      document.getElementById('statUsers').textContent = users.filter(u => u.role !== 'admin').length;
+      document.getElementById('statLoans').textContent = allLoans.length;
+      document.getElementById('statPending').textContent = allLoans.filter(l => l.status === 'em_analise').length;
+      document.getElementById('statApproved').textContent = allLoans.filter(l => l.status === 'aprovado').length;
+    }
+
+    function renderLoans(filter = 'all') {
+      const { allLoans } = getAllData();
+      const filtered = filter === 'all' ? allLoans : allLoans.filter(l => l.status === filter);
+      const tbody = document.getElementById('loansTable');
+      const empty = document.getElementById('loansEmpty');
+      tbody.innerHTML = '';
+      if (filtered.length === 0) { empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+
+      const statusMap = {
+        em_analise: { label: 'Em análise', class: 'bg-amber-50 text-amber-700' },
+        aprovado: { label: 'Aprovado', class: 'bg-emerald-50 text-emerald-700' },
+        recusado: { label: 'Recusado', class: 'bg-red-50 text-red-700' },
+        pago: { label: 'Pago', class: 'bg-slate-100 text-slate-600' }
+      };
+
+      filtered.slice().reverse().forEach(loan => {
+        const st = statusMap[loan.status] || statusMap.em_analise;
+        const date = new Date(loan.createdAt).toLocaleDateString('pt-BR');
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.innerHTML = `
+          <td class="px-6 py-4">
+            <p class="font-medium text-slate-900">${loan.userName}</p>
+            <p class="text-[12px] text-slate-400">${loan.userEmail}</p>
+          </td>
+          <td class="px-6 py-4 font-semibold text-slate-900">R$ ${Number(loan.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="px-6 py-4 text-slate-500">${loan.parcelas}x de R$ ${Number(loan.parcela).toFixed(2).replace('.', ',')}</td>
+          <td class="px-6 py-4 text-slate-400">${date}</td>
+          <td class="px-6 py-4"><span class="text-[11px] font-semibold px-2.5 py-1 rounded-full ${st.class}">${st.label}</span></td>
+          <td class="px-6 py-4">
+            <div class="flex gap-1.5 flex-wrap">
+              ${loan.status === 'em_analise' ? `
+                <button class="action-btn text-[11px] bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-2.5 py-1 rounded-lg font-medium transition" data-action="aprovado" data-userid="${loan.userId}" data-loanid="${loan.id}">Aprovar</button>
+                <button class="action-btn text-[11px] bg-red-50 text-red-700 hover:bg-red-100 px-2.5 py-1 rounded-lg font-medium transition" data-action="recusado" data-userid="${loan.userId}" data-loanid="${loan.id}">Recusar</button>
+              ` : ''}
+              ${loan.status === 'aprovado' ? `
+                <button class="action-btn text-[11px] bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-lg font-medium transition" data-action="pago" data-userid="${loan.userId}" data-loanid="${loan.id}">Marcar pago</button>
+              ` : ''}
+              ${loan.status !== 'em_analise' ? `
+                <button class="action-btn text-[11px] bg-amber-50 text-amber-700 hover:bg-amber-100 px-2.5 py-1 rounded-lg font-medium transition" data-action="em_analise" data-userid="${loan.userId}" data-loanid="${loan.id}">Reabrir</button>
+              ` : ''}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          pendingAction = { userId: btn.dataset.userid, loanId: btn.dataset.loanid, newStatus: btn.dataset.action };
+          const labels = { aprovado: 'aprovar', recusado: 'recusar', pago: 'marcar como pago', em_analise: 'reabrir' };
+          document.getElementById('modalTitle').textContent = 'Confirmar ação';
+          document.getElementById('modalDesc').textContent = `Deseja ${labels[btn.dataset.action] || 'alterar'} esta solicitação?`;
+          document.getElementById('statusModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function renderUsers() {
+      const { users } = getAllData();
+      const tbody = document.getElementById('usersTable');
+      tbody.innerHTML = '';
+      users.forEach(u => {
+        const date = new Date(u.createdAt).toLocaleDateString('pt-BR');
+        const isAdminUser = u.role === 'admin';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-medium text-slate-900">${u.name}</td>
+          <td class="px-6 py-4 text-slate-500">${u.cpf}</td>
+          <td class="px-6 py-4 text-slate-500">${u.email}</td>
+          <td class="px-6 py-4 text-slate-500">${u.whatsapp || '—'}</td>
+          <td class="px-6 py-4">
+            ${isAdminUser
+              ? '<span class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full">Admin</span>'
+              : '<span class="text-[11px] font-medium bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">Cliente</span>'}
+          </td>
+          <td class="px-6 py-4 text-slate-400">${date}</td>
+          <td class="px-6 py-4 text-slate-500">${(u.loans || []).length}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('modalCancel').addEventListener('click', () => {
+      document.getElementById('statusModal').classList.add('hidden');
+      pendingAction = null;
+    });
+
+    document.getElementById('modalConfirm').addEventListener('click', () => {
+      if (!pendingAction) return;
+      const users = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+      const userIdx = users.findIndex(u => u.id === pendingAction.userId);
+      if (userIdx !== -1) {
+        const loanIdx = (users[userIdx].loans || []).findIndex(l => l.id === pendingAction.loanId);
+        if (loanIdx !== -1) {
+          users[userIdx].loans[loanIdx].status = pendingAction.newStatus;
+          localStorage.setItem('credifacil_users', JSON.stringify(users));
+        }
+      }
+      document.getElementById('statusModal').classList.add('hidden');
+      pendingAction = null;
+      updateStats();
+      renderLoans(document.getElementById('filterStatus').value);
+    });
+
+    document.getElementById('filterStatus').addEventListener('change', (e) => renderLoans(e.target.value));
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('credifacil_session');
+      window.location.href = 'login.html';
+    });
+
+    updateStats();
+    renderLoans();
+    renderUsers();
+  </script>
+</body>
+</html>
