@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog | CrediFácil — Avaliações e dicas</title>
+  <meta name="description" content="Avaliações positivas e histórias de clientes CrediFácil. Veja o que dizem quem usou nosso crédito pessoal." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nu: { 50:'#F5F0FF',100:'#EDE5FF',400:'#A855F7',500:'#9333EA',600:'#820AD1',700:'#6B00B3',800:'#580A8F' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F7F7F8] text-slate-900 antialiased font-sans">
+
+  <nav class="nu-nav sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex justify-between h-[64px] items-center">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-nu-600 to-nu-800 flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-nu-600/25 tracking-tighter">CF</div>
+          <span class="text-[17px] font-bold tracking-tight text-slate-900">CrediFácil</span>
+        </a>
+        <div class="hidden md:flex items-center gap-7">
+          <a href="index.html" class="text-[13.5px] font-medium text-slate-500 hover:text-nu-600 transition">Início</a>
+          <a href="blog.html" class="text-[13.5px] font-medium text-nu-600">Blog</a>
+          <a href="index.html#simulador" class="text-[13.5px] font-medium text-slate-500 hover:text-nu-600 transition">Simulador</a>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <a href="login.html" class="text-[13.5px] font-semibold text-slate-700 hover:text-nu-600 px-3.5 py-2 rounded-xl transition">Entrar</a>
+          <a href="register.html" class="nu-btn-primary text-[13.5px] px-4 py-2.5">Abrir conta</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    <div class="text-center mb-12">
+      <span class="inline-block text-[12px] font-semibold text-nu-600 uppercase tracking-wider mb-3">Blog CrediFácil</span>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">O que nossos clientes dizem</h1>
+      <p class="mt-3 text-slate-500 text-[15px]">Avaliações reais de quem usou o CrediFácil para organizar as finanças.</p>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Avaliação 1 -->
+      <article class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+        <div class="flex items-center gap-1 text-amber-400 mb-3">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">“Processo rápido e transparente”</h2>
+        <p class="text-slate-600 text-[14.5px] leading-relaxed">
+          Fiz o cadastro em poucos minutos, simulei o valor e enviei a proposta. Em dois dias já tinha a resposta. Sem burocracia e sem taxa antecipada. Recomendo.
+        </p>
+        <p class="mt-4 text-[13px] text-slate-400">— Ana Paula S. · São Paulo/SP · outubro/2026</p>
+      </article>
+
+      <!-- Avaliação 2 -->
+      <article class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+        <div class="flex items-center gap-1 text-amber-400 mb-3">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">“Atendimento claro e sem pressão”</h2>
+        <p class="text-slate-600 text-[14.5px] leading-relaxed">
+          Gostei que ninguém pediu depósito ou taxa para liberar o crédito. Tudo foi explicado antes. O dinheiro caiu na conta depois da aprovação. Experiência positiva.
+        </p>
+        <p class="mt-4 text-[13px] text-slate-400">— Carlos Eduardo M. · Rio de Janeiro/RJ · setembro/2026</p>
+      </article>
+
+      <!-- Avaliação 3 -->
+      <article class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+        <div class="flex items-center gap-1 text-amber-400 mb-3">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">“Simulador ajudou a decidir”</h2>
+        <p class="text-slate-600 text-[14.5px] leading-relaxed">
+          Usei o simulador para ver as parcelas antes de pedir. Ficou dentro do que eu podia pagar. Aprovação foi rápida e o suporte respondeu por e-mail no mesmo dia.
+        </p>
+        <p class="mt-4 text-[13px] text-slate-400">— Juliana R. · Belo Horizonte/MG · agosto/2026</p>
+      </article>
+
+      <!-- Avaliação 4 -->
+      <article class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+        <div class="flex items-center gap-1 text-amber-400 mb-3">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">“Resolveu uma emergência”</h2>
+        <p class="text-slate-600 text-[14.5px] leading-relaxed">
+          Precisava de um valor para organizar contas atrasadas. O CrediFácil foi direto: cadastro, análise e depósito. Sem complicação. Já indiquei para amigos.
+        </p>
+        <p class="mt-4 text-[13px] text-slate-400">— Roberto L. · Curitiba/PR · julho/2026</p>
+      </article>
+
+      <!-- Avaliação 5 -->
+      <article class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+        <div class="flex items-center gap-1 text-amber-400 mb-3">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">“Site fácil de usar no celular”</h2>
+        <p class="text-slate-600 text-[14.5px] leading-relaxed">
+          Fiz tudo pelo celular. Interface limpa, cadastro simples e acompanhei o status no painel. Muito melhor do que eu esperava de um crédito online.
+        </p>
+        <p class="mt-4 text-[13px] text-slate-400">— Fernanda A. · Porto Alegre/RS · junho/2026</p>
+      </article>
+    </div>
+
+    <div class="mt-12 text-center">
+      <a href="register.html" class="nu-btn-primary inline-flex items-center gap-2 px-6 py-3.5 text-[15px]">
+        Quero simular meu crédito <i class="fas fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+  </main>
+
+  <footer class="bg-slate-950 text-slate-400 py-12 mt-16">
+    <div class="max-w-4xl mx-auto px-4 text-center text-[12px] space-y-2">
+      <p class="font-medium text-slate-300">credi-facil Soluções Ltda.</p>
+      <p>CNPJ 17.770.708/0001-24</p>
+      <p>Av. das Nações Unidas, 14261, Ed. WTMorumbi · São Paulo/SP · CEP 04794-000</p>
+      <p class="pt-2"><a href="mailto:credifacil@gmail.com" class="text-nu-400 hover:text-white">credifacil@gmail.com</a></p>
+      <p class="pt-3 text-slate-600">© 2026 CrediFácil</p>
+    </div>
+  </footer>
+</body>
+</html>
