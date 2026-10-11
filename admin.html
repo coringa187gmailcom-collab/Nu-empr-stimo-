@@ -304,7 +304,15 @@
               <span class="text-slate-500">${l.status || '—'}</span>
             </div>`).join('')}
         </div>
+        <a id="waFichaBtn" href="#" target="_blank" class="mt-5 w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-[14px] transition">
+          <i class="fab fa-whatsapp"></i> Enviar ficha no WhatsApp
+        </a>
       `;
+      const waText = encodeURIComponent(
+        `*Ficha CrediFácil*\nNome: ${u.name}\nCPF: ${u.cpf}\nE-mail: ${u.email}\nWhatsApp: ${u.whatsapp}\nCadastro: ${formatDate(u.createdAt)}`
+      );
+      // Abre WhatsApp Web com a ficha pronta para enviar (você escolhe o contato)
+      document.getElementById('waFichaBtn').href = `https://wa.me/?text=${waText}`;
       document.getElementById('fichaModal').classList.remove('hidden');
     }
 

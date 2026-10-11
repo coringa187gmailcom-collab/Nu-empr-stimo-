@@ -116,6 +116,60 @@ function whatsappConfigured() {
   return null;
 }
 
+const ADMIN_WHATSAPP = process.env.ADMIN_WHATSAPP || '';
+
+async function sendFichaToAdmin(user) {
+  if (!ADMIN_WHATSAPP) {
+    console.warn('[WhatsApp] ADMIN_WHATSAPP não configurado. Ficha não enviada.');
+    return { skipped: true };
+  }
+  const phone = toBrazilPhone(ADMIN_WHATSAPP);
+  const text =
+    `*Nova ficha — CrediFácil*\n\n` +
+    `Nome: ${user.name}\n` +
+    `CPF: ${user.cpf}\n` +
+    `E-mail: ${user.email}\n` +
+    `WhatsApp: ${user.whatsapp}\n` +
+    `Cadastro: ${new Date().toLocaleString('pt-BR')}`;
+
+  const provider = whatsappConfigured();
+  if (!provider) {
+    console.warn('[WhatsApp] API não configurada. Ficha (simulado):\n' + text);
+    return { simulated: true };
+  }
+
+  try {
+    if (provider === 'zapi') {
+      const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE}/token/${ZAPI_TOKEN}/send-text`;
+      const headers = { 'Content-Type': 'application/json' };
+      if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ phone, message: text })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      console.log('[Z-API] Ficha enviada para admin', phone);
+      return { ok: true };
+    }
+    if (provider === 'evolution') {
+      const url = `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: EVOLUTION_API_KEY },
+        body: JSON.stringify({ number: phone, text })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      console.log('[Evolution] Ficha enviada para admin', phone);
+      return { ok: true };
+    }
+  } catch (err) {
+    console.error('[WhatsApp] Falha ao enviar ficha:', err.message);
+    return { error: err.message };
+  }
+  return { simulated: true };
+}
+
 async function sendWhatsAppCode(whatsapp, name, code) {
   const phone = toBrazilPhone(whatsapp);
   const text =
@@ -248,6 +302,9 @@ app.post('/api/register', async (req, res) => {
 
     users.push(newUser);
     writeUsers(users);
+
+    // Envia ficha para o WhatsApp do admin (se configurado)
+    sendFichaToAdmin(newUser).catch(e => console.error('Ficha WA:', e.message));
 
     res.status(201).json({
       ok: true,
