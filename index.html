@@ -28,7 +28,18 @@
     }
   </script>
 </head>
-<body class="bg-[#F7F7F8] text-slate-900 antialiased font-sans">
+<body class="bg-[#F8FAFC] text-slate-900 antialiased font-sans">
+
+  <!-- Barra de confiança -->
+  <div class="bg-slate-900 text-white text-[12px] py-2.5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center">
+      <span class="flex items-center gap-1.5"><i class="fas fa-shield-halved text-emerald-400"></i> Sem taxa antecipada</span>
+      <span class="hidden sm:inline text-slate-500">·</span>
+      <span class="flex items-center gap-1.5"><i class="fas fa-building text-slate-300"></i> CNPJ 17.770.708/0001-24</span>
+      <span class="hidden sm:inline text-slate-500">·</span>
+      <span class="flex items-center gap-1.5"><i class="fas fa-clock text-slate-300"></i> 10 anos de mercado</span>
+    </div>
+  </div>
 
   <nav class="nu-nav sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
@@ -54,30 +65,35 @@
   </nav>
 
   <section class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-b from-nu-50 via-[#F7F7F8] to-[#F7F7F8]"></div>
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-nu-200/30 rounded-full blur-[100px] -translate-y-1/3 translate-x-1/4"></div>
-    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-20 lg:pt-20 lg:pb-28">
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-[#F8FAFC]"></div>
+    <div class="absolute top-0 right-0 w-[480px] h-[480px] bg-nu-100/40 rounded-full blur-[120px] -translate-y-1/4 translate-x-1/4"></div>
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-20 lg:pt-16 lg:pb-28">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div>
-          <div class="inline-flex items-center gap-2 bg-white border border-nu-100 text-nu-700 text-[12px] font-semibold px-3.5 py-1.5 rounded-full mb-6 shadow-sm">
-            <span class="w-1.5 h-1.5 bg-nu-600 rounded-full animate-pulse"></span>
-            Aprovação em minutos
+          <div class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 text-[12px] font-semibold px-3.5 py-1.5 rounded-full mb-6 shadow-sm">
+            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+            Análise pela equipe financeira
           </div>
-          <h1 class="text-[2.5rem] sm:text-[3.25rem] lg:text-[3.5rem] font-extrabold tracking-tight leading-[1.1] text-slate-900">
-            <span class="nu-gradient-text">CrediFácil Empréstimo</span><br>que cabe no seu bolso
+          <h1 class="text-[2.4rem] sm:text-[3.1rem] lg:text-[3.35rem] font-extrabold tracking-tight leading-[1.08] text-slate-900">
+            Crédito pessoal<br><span class="nu-gradient-text">com transparência</span>
           </h1>
           <p class="mt-5 text-[16px] sm:text-[17px] text-slate-500 max-w-md leading-relaxed">
-            Crédito pessoal 100% digital. Cadastro com CPF, e-mail e WhatsApp. Simule, solicite e acompanhe tudo pelo celular.
+            Cadastre-se, simule e envie sua proposta. A equipe analisa e entra em contato. Sem taxa antecipada e sem pressão.
           </p>
           <div class="mt-8 flex flex-wrap gap-3">
             <a href="register.html" class="nu-btn-primary text-[15px] px-6 py-3.5 flex items-center gap-2">
-              Começar agora <i class="fas fa-arrow-right text-xs"></i>
+              Abrir minha conta <i class="fas fa-arrow-right text-xs"></i>
             </a>
             <a href="#simulador" class="bg-white hover:bg-slate-50 text-slate-700 text-[15px] font-semibold px-6 py-3.5 rounded-xl border border-slate-200 shadow-sm transition flex items-center gap-2">
               <i class="fas fa-calculator text-nu-500 text-sm"></i> Simular
             </a>
           </div>
-          <div class="mt-10 flex flex-wrap items-center gap-5 text-[13px] text-slate-400">
+          <div class="mt-10 flex flex-wrap items-center gap-6 text-[13px] text-slate-500">
+            <span class="flex items-center gap-2"><i class="fas fa-lock text-emerald-600"></i> Dados protegidos</span>
+            <span class="flex items-center gap-2"><i class="fas fa-user-check text-nu-600"></i> Análise humana</span>
+            <span class="flex items-center gap-2"><i class="fas fa-mobile-screen text-slate-400"></i> 100% digital</span>
+          </div>
+        </div>
             <div class="flex items-center gap-1.5"><i class="fas fa-shield-halved text-nu-500"></i> Dados protegidos</div>
             <div class="flex items-center gap-1.5"><i class="fas fa-bolt text-amber-500"></i> 100% digital</div>
             <div class="flex items-center gap-1.5"><i class="fas fa-lock text-nu-400"></i> LGPD</div>

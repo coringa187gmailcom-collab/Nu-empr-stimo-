@@ -1,17 +1,17 @@
-/* NU Empréstimo — Design system profissional */
+/* CrediFácil Empréstimo — Design profissional */
 
 :root {
-  --nu-purple: #820AD1;
-  --nu-purple-dark: #6B00B3;
-  --nu-purple-light: #9B30E8;
-  --nu-bg: #F7F7F8;
+  --nu-purple: #6D28D9;
+  --nu-purple-dark: #5B21B6;
+  --nu-purple-light: #8B5CF6;
+  --nu-bg: #F8FAFC;
   --nu-card: #FFFFFF;
-  --nu-text: #1A1A1A;
-  --nu-muted: #6B7280;
-  --nu-border: #E5E7EB;
-  --nu-success: #00A868;
-  --nu-warning: #F59E0B;
-  --nu-danger: #EF4444;
+  --nu-text: #0F172A;
+  --nu-muted: #64748B;
+  --nu-border: #E2E8F0;
+  --nu-success: #059669;
+  --nu-warning: #D97706;
+  --nu-danger: #DC2626;
 }
 
 html {
@@ -105,25 +105,25 @@ input:focus, select:focus, button:focus {
 }
 
 .nu-gradient-text {
-  background: linear-gradient(135deg, #820AD1 0%, #A855F7 50%, #7C3AED 100%);
+  background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .nu-btn-primary {
-  background: linear-gradient(135deg, #820AD1 0%, #6B00B3 100%);
+  background: linear-gradient(135deg, #6D28D9 0%, #5B21B6 100%);
   color: white;
   font-weight: 600;
   border-radius: 0.875rem;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(130, 10, 209, 0.3);
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.28);
 }
 
 .nu-btn-primary:hover {
-  background: linear-gradient(135deg, #6B00B3 0%, #5A0099 100%);
+  background: linear-gradient(135deg, #5B21B6 0%, #4C1D95 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(130, 10, 209, 0.4);
+  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.35);
 }
 
 .nu-nav {
