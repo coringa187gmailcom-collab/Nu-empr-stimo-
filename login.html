@@ -70,10 +70,7 @@
           </div>
 
           <p id="apiError" class="hidden text-red-500 text-sm text-center"></p>
-          <div id="verifyHint" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl text-[13px] text-amber-800 text-center">
-            Confirme seu e-mail antes de entrar.
-            <button type="button" id="resendFromLogin" class="block mx-auto mt-2 font-semibold text-nu-600 hover:underline">Reenviar e-mail de confirmação</button>
-          </div>
+          <div id="verifyHint" class="hidden"></div>
 
           <button type="submit" id="submitBtn" class="nu-btn-primary w-full text-[15px] py-3.5 flex items-center justify-center gap-2">Entrar</button>
         </form>
@@ -91,6 +88,7 @@
   <script>
     const apiBase = (window.location.protocol === 'file:') ? 'http://localhost:3000' : window.location.origin;
     let pendingEmail = '';
+    let pendingWhatsapp = '';
 
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -115,14 +113,6 @@
           body: JSON.stringify({ loginId, password })
         });
         const data = await res.json();
-
-        if (res.status === 403 && data.needsVerification) {
-          pendingEmail = data.email || '';
-          document.getElementById('verifyHint').classList.remove('hidden');
-          btn.disabled = false;
-          btn.innerHTML = 'Entrar';
-          return;
-        }
 
         if (!res.ok) {
           document.getElementById('apiError').textContent = data.error || 'Erro ao entrar';
@@ -158,16 +148,18 @@
       }
     });
 
+    let pendingWhatsapp = '';
     document.getElementById('resendFromLogin').addEventListener('click', async function() {
-      if (!pendingEmail) return;
+      if (!pendingEmail && !pendingWhatsapp) return;
       this.textContent = 'Enviando...';
       try {
-        await fetch(apiBase + '/api/resend-verification', {
+        const res = await fetch(apiBase + '/api/resend-verification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: pendingEmail })
+          body: JSON.stringify({ email: pendingEmail, whatsapp: pendingWhatsapp })
         });
-        this.textContent = 'E-mail reenviado!';
+        const data = await res.json();
+        this.textContent = res.ok ? (data.message || 'Código reenviado!') : (data.error || 'Erro ao reenviar');
       } catch {
         this.textContent = 'Erro ao reenviar';
       }

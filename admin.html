@@ -95,6 +95,9 @@
       <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="users">
         <i class="fas fa-users mr-1.5"></i> Usuários
       </button>
+      <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="fichas">
+        <i class="fas fa-id-card mr-1.5"></i> Fichas
+      </button>
     </div>
 
     <div id="tab-loans" class="tab-content">
@@ -133,8 +136,9 @@
 
     <div id="tab-users" class="tab-content hidden">
       <div class="nu-card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100">
+        <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
           <h2 class="font-bold text-slate-900 text-[15px]">Usuários cadastrados</h2>
+          <input type="search" id="searchUsers" placeholder="Buscar nome, CPF, e-mail..." class="text-[13px] px-3 py-2 rounded-lg border border-slate-200 w-full sm:w-64 outline-none focus:border-nu-500" />
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-[13.5px]">
@@ -144,17 +148,45 @@
                 <th class="px-6 py-3 font-medium">CPF</th>
                 <th class="px-6 py-3 font-medium">E-mail</th>
                 <th class="px-6 py-3 font-medium">WhatsApp</th>
-                <th class="px-6 py-3 font-medium">Perfil</th>
+                <th class="px-6 py-3 font-medium">Status</th>
                 <th class="px-6 py-3 font-medium">Cadastro</th>
                 <th class="px-6 py-3 font-medium">Solicitações</th>
+                <th class="px-6 py-3 font-medium">Ações</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
+        <p id="usersEmpty" class="hidden px-6 py-10 text-center text-slate-400 text-[14px]">Nenhum usuário encontrado.</p>
       </div>
     </div>
+
+    <div id="tab-fichas" class="tab-content hidden">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="font-bold text-slate-900 text-[15px]">Fichas dos usuários</h2>
+          <p class="text-[13px] text-slate-500 mt-0.5">Dados completos de cada cliente cadastrado</p>
+        </div>
+        <input type="search" id="searchFichas" placeholder="Buscar ficha..." class="text-[13px] px-3 py-2 rounded-lg border border-slate-200 w-full sm:w-64 outline-none focus:border-nu-500" />
+      </div>
+      <div id="fichasGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <p id="fichasEmpty" class="hidden py-12 text-center text-slate-400 text-[14px]">Nenhuma ficha para exibir.</p>
+    </div>
   </main>
+
+  <!-- Modal ficha completa -->
+  <div id="fichaModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+      <div class="flex items-start justify-between gap-3 mb-5">
+        <div>
+          <p class="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Ficha do cliente</p>
+          <h3 class="font-bold text-lg text-slate-900" id="fichaModalName">—</h3>
+        </div>
+        <button type="button" id="fichaModalClose" class="w-9 h-9 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 transition"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="fichaModalBody" class="space-y-3 text-[14px]"></div>
+    </div>
+  </div>
 
   <div id="statusModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
@@ -187,8 +219,32 @@
       });
     });
 
+    let cachedUsers = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+
+    async function loadUsersFromApi() {
+      try {
+        const res = await fetch((window.location.protocol === 'file:' ? 'http://localhost:3000' : window.location.origin) + '/api/admin/users');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.users && data.users.length) {
+          // Mescla API + localStorage (mantém loans locais se API não tiver)
+          const local = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+          const map = new Map();
+          local.forEach(u => map.set(u.id, u));
+          data.users.forEach(u => {
+            const prev = map.get(u.id);
+            map.set(u.id, { ...prev, ...u, loans: (u.loans && u.loans.length) ? u.loans : (prev?.loans || []) });
+          });
+          cachedUsers = Array.from(map.values());
+          localStorage.setItem('credifacil_users', JSON.stringify(cachedUsers));
+        }
+      } catch (e) {
+        console.warn('API admin indisponível, usando localStorage');
+      }
+    }
+
     function getAllData() {
-      const users = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+      const users = cachedUsers.length ? cachedUsers : JSON.parse(localStorage.getItem('credifacil_users') || '[]');
       const allLoans = [];
       users.forEach(u => {
         (u.loans || []).forEach(loan => {
@@ -204,6 +260,40 @@
       document.getElementById('statLoans').textContent = allLoans.length;
       document.getElementById('statPending').textContent = allLoans.filter(l => l.status === 'em_analise').length;
       document.getElementById('statApproved').textContent = allLoans.filter(l => l.status === 'aprovado').length;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      try { return new Date(iso).toLocaleString('pt-BR'); } catch { return '—'; }
+    }
+
+    function openFicha(userId) {
+      const { users } = getAllData();
+      const u = users.find(x => x.id === userId);
+      if (!u) return;
+      document.getElementById('fichaModalName').textContent = u.name;
+      const loans = u.loans || [];
+      const verified = u.whatsappVerified || u.emailVerified;
+      document.getElementById('fichaModalBody').innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">CPF</p><p class="font-medium text-slate-900">${u.cpf || '—'}</p></div>
+          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">Perfil</p><p class="font-medium text-slate-900">${u.role === 'admin' ? 'Administrador' : 'Cliente'}</p></div>
+          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">E-mail</p><p class="font-medium text-slate-900 break-all">${u.email || '—'}</p></div>
+          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">WhatsApp</p><p class="font-medium text-slate-900">${u.whatsapp || '—'}</p></div>
+          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">WhatsApp confirmado</p><p class="font-medium ${verified ? 'text-emerald-600' : 'text-amber-600'}">${verified ? 'Sim' : 'Não'}</p></div>
+          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">Cadastro em</p><p class="font-medium text-slate-900">${formatDate(u.createdAt)}</p></div>
+          <div class="p-3 rounded-xl bg-slate-50 sm:col-span-2"><p class="text-[11px] text-slate-400 uppercase">ID</p><p class="font-mono text-[12px] text-slate-600 break-all">${u.id || '—'}</p></div>
+        </div>
+        <div class="mt-4">
+          <p class="text-[12px] font-semibold text-slate-500 uppercase mb-2">Solicitações (${loans.length})</p>
+          ${loans.length === 0 ? '<p class="text-slate-400 text-[13px]">Nenhuma solicitação.</p>' : loans.map(l => `
+            <div class="flex justify-between items-center py-2 border-b border-slate-100 text-[13px]">
+              <span>R$ ${Number(l.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})} · ${l.parcelas||'—'}x</span>
+              <span class="text-slate-500">${l.status || '—'}</span>
+            </div>`).join('')}
+        </div>
+      `;
+      document.getElementById('fichaModal').classList.remove('hidden');
     }
 
     function renderLoans(filter = 'all') {
@@ -265,13 +355,32 @@
       });
     }
 
-    function renderUsers() {
+    function filterUsers(list, q) {
+      q = (q || '').toLowerCase().trim();
+      if (!q) return list;
+      return list.filter(u =>
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.cpf || '').includes(q) ||
+        (u.whatsapp || '').includes(q)
+      );
+    }
+
+    function renderUsers(query) {
       const { users } = getAllData();
+      const list = filterUsers(users, query !== undefined ? query : document.getElementById('searchUsers')?.value);
       const tbody = document.getElementById('usersTable');
+      const empty = document.getElementById('usersEmpty');
       tbody.innerHTML = '';
-      users.forEach(u => {
-        const date = new Date(u.createdAt).toLocaleDateString('pt-BR');
+      if (list.length === 0) {
+        if (empty) empty.classList.remove('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+      list.forEach(u => {
+        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : '—';
         const isAdminUser = u.role === 'admin';
+        const verified = u.whatsappVerified || u.emailVerified;
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50/80 transition';
         tr.innerHTML = `
@@ -282,12 +391,68 @@
           <td class="px-6 py-4">
             ${isAdminUser
               ? '<span class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full">Admin</span>'
-              : '<span class="text-[11px] font-medium bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">Cliente</span>'}
+              : verified
+                ? '<span class="text-[11px] font-medium bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">Confirmado</span>'
+                : '<span class="text-[11px] font-medium bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full">Pendente</span>'}
           </td>
           <td class="px-6 py-4 text-slate-400">${date}</td>
           <td class="px-6 py-4 text-slate-500">${(u.loans || []).length}</td>
+          <td class="px-6 py-4">
+            <button type="button" class="text-nu-600 font-semibold text-[12px] hover:underline" data-ficha="${u.id}">Ver ficha</button>
+          </td>
         `;
         tbody.appendChild(tr);
+      });
+      tbody.querySelectorAll('[data-ficha]').forEach(btn => {
+        btn.addEventListener('click', () => openFicha(btn.getAttribute('data-ficha')));
+      });
+    }
+
+    function renderFichas(query) {
+      const { users } = getAllData();
+      const list = filterUsers(users.filter(u => u.role !== 'admin'), query !== undefined ? query : document.getElementById('searchFichas')?.value);
+      const grid = document.getElementById('fichasGrid');
+      const empty = document.getElementById('fichasEmpty');
+      if (!grid) return;
+      grid.innerHTML = '';
+      if (list.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      list.forEach(u => {
+        const verified = u.whatsappVerified || u.emailVerified;
+        const loans = u.loans || [];
+        const card = document.createElement('div');
+        card.className = 'nu-card p-5 hover:shadow-md transition cursor-pointer';
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-nu-100 text-nu-700 flex items-center justify-center font-bold text-sm">${(u.name||'?').charAt(0).toUpperCase()}</div>
+              <div>
+                <p class="font-bold text-slate-900 text-[15px]">${u.name}</p>
+                <p class="text-[12px] text-slate-400">${u.role === 'admin' ? 'Administrador' : 'Cliente'}</p>
+              </div>
+            </div>
+            ${verified
+              ? '<span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full">OK</span>'
+              : '<span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-1 rounded-full">Pendente</span>'}
+          </div>
+          <div class="space-y-2 text-[13px]">
+            <p class="flex justify-between gap-2"><span class="text-slate-400">CPF</span><span class="font-medium text-slate-800">${u.cpf||'—'}</span></p>
+            <p class="flex justify-between gap-2"><span class="text-slate-400">E-mail</span><span class="font-medium text-slate-800 truncate max-w-[60%]">${u.email||'—'}</span></p>
+            <p class="flex justify-between gap-2"><span class="text-slate-400">WhatsApp</span><span class="font-medium text-slate-800">${u.whatsapp||'—'}</span></p>
+            <p class="flex justify-between gap-2"><span class="text-slate-400">Cadastro</span><span class="font-medium text-slate-800">${u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : '—'}</span></p>
+            <p class="flex justify-between gap-2"><span class="text-slate-400">Solicitações</span><span class="font-medium text-slate-800">${loans.length}</span></p>
+          </div>
+          <button type="button" class="mt-4 w-full text-[13px] font-semibold text-nu-600 border border-nu-100 rounded-xl py-2 hover:bg-nu-50 transition" data-ficha="${u.id}">Abrir ficha completa</button>
+        `;
+        grid.appendChild(card);
+        card.querySelector('[data-ficha]').addEventListener('click', (e) => {
+          e.stopPropagation();
+          openFicha(u.id);
+        });
+        card.addEventListener('click', () => openFicha(u.id));
       });
     }
 
@@ -318,10 +483,22 @@
       localStorage.removeItem('credifacil_session');
       window.location.href = 'login.html';
     });
+    document.getElementById('searchUsers')?.addEventListener('input', (e) => renderUsers(e.target.value));
+    document.getElementById('searchFichas')?.addEventListener('input', (e) => renderFichas(e.target.value));
+    document.getElementById('fichaModalClose')?.addEventListener('click', () => {
+      document.getElementById('fichaModal').classList.add('hidden');
+    });
+    document.getElementById('fichaModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'fichaModal') e.target.classList.add('hidden');
+    });
 
-    updateStats();
-    renderLoans();
-    renderUsers();
+    (async function init() {
+      await loadUsersFromApi();
+      updateStats();
+      renderLoans();
+      renderUsers();
+      renderFichas();
+    })();
   </script>
 </body>
 </html>

@@ -39,7 +39,7 @@
       <div id="formCard" class="bg-white rounded-[1.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
         <div class="text-center mb-8">
           <h1 class="text-2xl font-bold text-slate-900">Abrir sua conta</h1>
-          <p class="mt-2 text-slate-500 text-[14px]">Cadastro com CPF, e-mail e WhatsApp · confirmação por e-mail</p>
+          <p class="mt-2 text-slate-500 text-[14px]">Cadastro com CPF, e-mail e WhatsApp · acesso imediato</p>
         </div>
 
         <form id="registerForm" class="space-y-5" novalidate>
@@ -119,35 +119,18 @@
         </div>
       </div>
 
-      <!-- Sucesso: verifique o e-mail -->
+      <!-- Sucesso: conta criada -->
       <div id="successCard" class="hidden bg-white rounded-[1.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10 text-center">
-        <div class="w-16 h-16 rounded-2xl bg-nu-100 text-nu-600 flex items-center justify-center text-3xl mx-auto mb-5">
-          <i class="fas fa-envelope-open-text"></i>
+        <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-5">
+          <i class="fas fa-check-circle"></i>
         </div>
-        <h1 class="text-2xl font-bold text-slate-900">Verifique seu e-mail</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Conta criada!</h1>
         <p class="mt-3 text-slate-500 text-[14.5px] leading-relaxed">
-          Enviamos um link de confirmação para<br>
-          <strong class="text-slate-800" id="sentEmail">—</strong>
+          Seu cadastro foi concluído. Você já pode usar a plataforma.
         </p>
-        <p class="mt-4 text-[13px] text-slate-400">
-          Clique no link do e-mail para ativar sua conta. O link expira em 24 horas.
-        </p>
-
-        <!-- Modo simulado (sem chave Brevo) -->
-        <div id="simulatedBox" class="hidden mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-left">
-          <p class="text-[12px] font-semibold text-amber-800 mb-2"><i class="fas fa-flask mr-1"></i> Modo simulado (Brevo não configurado)</p>
-          <p class="text-[12px] text-amber-700 mb-3">Use o link abaixo para confirmar:</p>
-          <a id="simulatedLink" href="#" class="text-[12px] text-nu-600 break-all font-medium hover:underline"></a>
-        </div>
-
-        <button id="resendBtn" class="mt-6 text-[13.5px] font-semibold text-nu-600 hover:text-nu-700">
-          Não recebeu? Reenviar e-mail
-        </button>
-        <p id="resendMsg" class="hidden mt-2 text-[12px] text-emerald-600"></p>
-
-        <div class="mt-8">
-          <a href="login.html" class="text-[13.5px] text-slate-500 hover:text-slate-700">Já confirmei · Ir para login</a>
-        </div>
+        <a id="goVerify" href="dashboard.html" class="nu-btn-primary inline-flex items-center justify-center gap-2 mt-8 w-full py-3.5 text-[15px]">
+          Ir para área do cliente <i class="fas fa-arrow-right text-xs"></i>
+        </a>
       </div>
 
     </div>
@@ -176,6 +159,7 @@
     });
 
     let registeredEmail = '';
+    let registeredWhatsapp = '';
 
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -226,19 +210,21 @@
           return;
         }
 
-        registeredEmail = data.email || email;
+        if (data.user) {
+          localStorage.setItem('credifacil_session', JSON.stringify(data.user));
+        }
         document.getElementById('formCard').classList.add('hidden');
         document.getElementById('successCard').classList.remove('hidden');
-        document.getElementById('sentEmail').textContent = registeredEmail;
-
-        // Modo simulado: mostra o link
-        if (data.simulated && data.verificationToken) {
-          const link = apiBase + '/verify.html?token=' + data.verificationToken;
-          document.getElementById('simulatedBox').classList.remove('hidden');
-          const a = document.getElementById('simulatedLink');
-          a.href = link;
-          a.textContent = link;
+        const go = document.getElementById('goVerify');
+        if (go) {
+          go.href = data.user ? 'dashboard.html' : 'login.html';
+          go.innerHTML = data.user
+            ? 'Ir para área do cliente <i class="fas fa-arrow-right text-xs"></i>'
+            : 'Fazer login <i class="fas fa-arrow-right text-xs"></i>';
         }
+        setTimeout(() => {
+          window.location.href = data.user ? 'dashboard.html' : 'login.html';
+        }, 1500);
       } catch (err) {
         document.getElementById('apiError').textContent =
           'Não foi possível conectar ao servidor. Rode o backend (npm start na pasta server) e tente de novo.';
@@ -248,41 +234,6 @@
       }
     });
 
-    document.getElementById('resendBtn').addEventListener('click', async function() {
-      if (!registeredEmail) return;
-      this.disabled = true;
-      this.textContent = 'Enviando...';
-      try {
-        const res = await fetch(apiBase + '/api/resend-verification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: registeredEmail })
-        });
-        const data = await res.json();
-        const msg = document.getElementById('resendMsg');
-        msg.classList.remove('hidden');
-        if (res.ok) {
-          msg.textContent = 'E-mail reenviado! Confira sua caixa de entrada.';
-          msg.classList.remove('text-red-500');
-          msg.classList.add('text-emerald-600');
-          if (data.simulated && data.verificationToken) {
-            const link = apiBase + '/verify.html?token=' + data.verificationToken;
-            document.getElementById('simulatedBox').classList.remove('hidden');
-            const a = document.getElementById('simulatedLink');
-            a.href = link;
-            a.textContent = link;
-          }
-        } else {
-          msg.textContent = data.error || 'Falha ao reenviar';
-          msg.classList.add('text-red-500');
-        }
-      } catch {
-        document.getElementById('resendMsg').textContent = 'Erro de conexão';
-        document.getElementById('resendMsg').classList.remove('hidden');
-      }
-      this.disabled = false;
-      this.textContent = 'Não recebeu? Reenviar e-mail';
-    });
   </script>
 </body>
 </html>

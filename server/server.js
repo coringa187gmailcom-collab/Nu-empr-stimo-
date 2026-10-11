@@ -1,18 +1,11 @@
 /**
  * NU Empréstimo — Backend
- * Confirmação de e-mail via Brevo (Sendinblue)
- *
- * 1. Crie conta em https://www.brevo.com
- * 2. Vá em SMTP & API → API Keys → Generate a new API key
- * 3. Cole a chave no arquivo .env (BREVO_API_KEY=...)
- * 4. Configure o e-mail remetente verificado no Brevo (BREVO_SENDER_EMAIL)
- * 5. npm install && npm start
+ * Confirmação por código via WhatsApp (Z-API / Evolution) ou modo simulado
  */
 
 const path = require('path');
 const fs = require('fs');
 
-// Carrega .env da pasta server ou da raiz do projeto
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
@@ -26,23 +19,24 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'users.json');
 const FRONTEND_DIR = path.join(__dirname, '..');
 
-// ========== Config ==========
-const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
-const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'noreply@nuemprestimo.com';
-const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'NU Empréstimo';
 const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`;
 
-// ========== Middleware ==========
+// WhatsApp providers (opcional)
+const ZAPI_INSTANCE = process.env.ZAPI_INSTANCE_ID || '';
+const ZAPI_TOKEN = process.env.ZAPI_TOKEN || '';
+const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN || '';
+const EVOLUTION_URL = (process.env.EVOLUTION_URL || '').replace(/\/$/, '');
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
+const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE || '';
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(FRONTEND_DIR));
 
-// ========== Storage (JSON file) ==========
 function ensureDataFile() {
   const dir = path.dirname(DATA_FILE);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   if (!fs.existsSync(DATA_FILE)) {
-    // Seed admin
     const admin = {
       id: 'admin-nu-001',
       name: 'Administrador',
@@ -51,8 +45,9 @@ function ensureDataFile() {
       whatsapp: '(11) 99999-0000',
       password: '20142018sp',
       role: 'admin',
+      whatsappVerified: true,
       emailVerified: true,
-      verificationToken: null,
+      verificationCode: null,
       verificationExpires: null,
       createdAt: new Date().toISOString(),
       loans: []
@@ -90,105 +85,103 @@ function validateCPF(cpf) {
   return rest === parseInt(cpf.charAt(10));
 }
 
-// ========== Brevo — envio de e-mail ==========
-async function sendVerificationEmail(toEmail, toName, token) {
-  if (!BREVO_API_KEY || BREVO_API_KEY === 'cole_sua_chave_aqui') {
-    console.warn('[Brevo] API key não configurada. E-mail NÃO enviado.');
-    console.warn(`[Brevo] Token de verificação para ${toEmail}: ${token}`);
-    return { simulated: true, token };
-  }
-
-  const verifyUrl = `${APP_URL}/verify.html?token=${token}`;
-
-  const htmlContent = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#F7F7F8;font-family:Inter,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F7F8;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:480px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
-        <tr>
-          <td style="background:linear-gradient(135deg,#820AD1,#6B00B3);padding:28px 32px;text-align:center;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:12px;padding:8px 16px;">
-              <span style="color:#fff;font-size:18px;font-weight:800;letter-spacing:-0.5px;">NU</span>
-              <span style="color:#fff;font-size:16px;font-weight:600;margin-left:4px;">Empréstimo</span>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:36px 32px;">
-            <h1 style="margin:0 0 12px;font-size:22px;color:#1A1A1A;font-weight:700;">Confirme seu e-mail</h1>
-            <p style="margin:0 0 24px;font-size:15px;color:#6B7280;line-height:1.6;">
-              Olá, <strong style="color:#1A1A1A;">${toName.split(' ')[0]}</strong>!<br>
-              Para ativar sua conta na NU Empréstimo, clique no botão abaixo:
-            </p>
-            <div style="text-align:center;margin:32px 0;">
-              <a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(135deg,#820AD1,#6B00B3);color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 32px;border-radius:12px;box-shadow:0 4px 14px rgba(130,10,209,0.35);">
-                Confirmar meu e-mail
-              </a>
-            </div>
-            <p style="margin:0 0 8px;font-size:13px;color:#9CA3AF;line-height:1.5;">
-              Ou copie e cole este link no navegador:
-            </p>
-            <p style="margin:0 0 24px;font-size:12px;color:#820AD1;word-break:break-all;">${verifyUrl}</p>
-            <p style="margin:0;font-size:12px;color:#9CA3AF;line-height:1.5;">
-              Este link expira em <strong>24 horas</strong>. Se você não criou esta conta, ignore este e-mail.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:20px 32px;border-top:1px solid #F3F4F6;text-align:center;">
-            <p style="margin:0;font-size:11px;color:#9CA3AF;">© 2026 NU Empréstimo · E-mail automático, não responda.</p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-
-  const payload = {
-    sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
-    to: [{ email: toEmail, name: toName }],
-    subject: 'Confirme seu e-mail — NU Empréstimo',
-    htmlContent
-  };
-
-  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'accept': 'application/json',
-      'api-key': BREVO_API_KEY,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (!res.ok) {
-    const errBody = await res.text();
-    console.error('[Brevo] Erro ao enviar:', res.status, errBody);
-    throw new Error(`Falha ao enviar e-mail (${res.status}): ${errBody}`);
-  }
-
-  const data = await res.json();
-  console.log('[Brevo] E-mail enviado para', toEmail, '→ messageId:', data.messageId);
-  return data;
+function onlyDigits(s) {
+  return String(s || '').replace(/\D/g, '');
 }
 
-// ========== API Routes ==========
+function toBrazilPhone(whatsapp) {
+  let d = onlyDigits(whatsapp);
+  if (d.length === 10 || d.length === 11) d = '55' + d;
+  return d;
+}
 
-// Health / status da configuração
+function generateCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function whatsappConfigured() {
+  if (ZAPI_INSTANCE && ZAPI_TOKEN) return 'zapi';
+  if (EVOLUTION_URL && EVOLUTION_API_KEY && EVOLUTION_INSTANCE) return 'evolution';
+  return null;
+}
+
+async function sendWhatsAppCode(whatsapp, name, code) {
+  const phone = toBrazilPhone(whatsapp);
+  const text =
+    `*NU Empréstimo*\n\nOlá, ${name.split(' ')[0]}!\nSeu código de confirmação é:\n\n*${code}*\n\nVálido por 15 minutos. Não compartilhe.`;
+
+  const provider = whatsappConfigured();
+
+  if (!provider) {
+    console.warn('[WhatsApp] Nenhuma API configurada (Z-API / Evolution). Modo simulado.');
+    console.warn(`[WhatsApp] Código para ${phone}: ${code}`);
+    return { simulated: true, code };
+  }
+
+  try {
+    if (provider === 'zapi') {
+      const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE}/token/${ZAPI_TOKEN}/send-text`;
+      const headers = { 'Content-Type': 'application/json' };
+      if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ phone, message: text })
+      });
+      const body = await res.text();
+      if (!res.ok) {
+        console.error('[Z-API] Erro:', res.status, body);
+        throw new Error(`Z-API ${res.status}: ${body}`);
+      }
+      console.log('[Z-API] Código enviado para', phone);
+      return { simulated: false, provider: 'zapi' };
+    }
+
+    if (provider === 'evolution') {
+      const url = `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: EVOLUTION_API_KEY
+        },
+        body: JSON.stringify({
+          number: phone,
+          text
+        })
+      });
+      const body = await res.text();
+      if (!res.ok) {
+        console.error('[Evolution] Erro:', res.status, body);
+        throw new Error(`Evolution ${res.status}: ${body}`);
+      }
+      console.log('[Evolution] Código enviado para', phone);
+      return { simulated: false, provider: 'evolution' };
+    }
+  } catch (err) {
+    console.error('[WhatsApp] Falha no envio:', err.message);
+    // Ainda devolve código em modo simulado para não travar o cadastro
+    return { simulated: true, code, error: err.message };
+  }
+
+  return { simulated: true, code };
+}
+
+function isVerified(user) {
+  if (user.role === 'admin') return true;
+  return !!(user.whatsappVerified || user.emailVerified);
+}
+
+// ========== API ==========
+
 app.get('/api/status', (req, res) => {
   res.json({
     ok: true,
-    brevoConfigured: !!(BREVO_API_KEY && BREVO_API_KEY !== 'cole_sua_chave_aqui'),
-    sender: BREVO_SENDER_EMAIL,
+    whatsappProvider: whatsappConfigured() || 'simulated',
     appUrl: APP_URL
   });
 });
 
-// Cadastro + envio de e-mail de confirmação
 app.post('/api/register', async (req, res) => {
   try {
     const { name, cpf, email, whatsapp, password } = req.body || {};
@@ -202,7 +195,7 @@ app.post('/api/register', async (req, res) => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'E-mail inválido' });
     }
-    const wa = String(whatsapp || '').replace(/\D/g, '');
+    const wa = onlyDigits(whatsapp);
     if (wa.length < 10 || wa.length > 11) {
       return res.status(400).json({ error: 'WhatsApp inválido' });
     }
@@ -216,15 +209,15 @@ app.post('/api/register', async (req, res) => {
     }
 
     const users = readUsers();
-    if (users.some(u => u.cpf.replace(/\D/g, '') === String(cpf).replace(/\D/g, ''))) {
+    if (users.some(u => onlyDigits(u.cpf) === onlyDigits(cpf))) {
       return res.status(409).json({ error: 'CPF já cadastrado' });
     }
     if (users.some(u => u.email === emailNorm)) {
       return res.status(409).json({ error: 'E-mail já cadastrado' });
     }
-
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    if (users.some(u => onlyDigits(u.whatsapp) === wa)) {
+      return res.status(409).json({ error: 'WhatsApp já cadastrado' });
+    }
 
     const newUser = {
       id: uuidv4(),
@@ -232,11 +225,12 @@ app.post('/api/register', async (req, res) => {
       cpf: cpf.trim(),
       email: emailNorm,
       whatsapp: whatsapp.trim(),
-      password, // em produção: usar bcrypt
+      password,
       role: 'user',
-      emailVerified: false,
-      verificationToken: token,
-      verificationExpires: expires,
+      whatsappVerified: true,
+      emailVerified: true,
+      verificationCode: null,
+      verificationExpires: null,
       createdAt: new Date().toISOString(),
       loans: []
     };
@@ -244,25 +238,21 @@ app.post('/api/register', async (req, res) => {
     users.push(newUser);
     writeUsers(users);
 
-    let emailResult;
-    try {
-      emailResult = await sendVerificationEmail(emailNorm, newUser.name, token);
-    } catch (mailErr) {
-      // Remove usuário se o e-mail falhar de forma crítica (opcional: manter e permitir reenvio)
-      console.error('Erro no envio de e-mail:', mailErr.message);
-      return res.status(502).json({
-        error: 'Conta criada, mas falha ao enviar e-mail de confirmação. Verifique a chave Brevo e o remetente.',
-        detail: mailErr.message,
-        userId: newUser.id
-      });
-    }
-
     res.status(201).json({
       ok: true,
-      message: 'Conta criada! Verifique seu e-mail para confirmar.',
+      message: 'Conta criada com sucesso! Você já pode entrar.',
       email: emailNorm,
-      // Só em modo simulado (sem API key) devolvemos o token para testes
-      ...(emailResult?.simulated ? { simulated: true, verificationToken: token } : {})
+      whatsapp: whatsapp.trim(),
+      userId: newUser.id,
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        cpf: newUser.cpf,
+        whatsapp: newUser.whatsapp,
+        role: 'user',
+        whatsappVerified: true
+      }
     });
   } catch (err) {
     console.error(err);
@@ -270,73 +260,96 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Confirmar e-mail pelo token
-app.get('/api/verify', (req, res) => {
-  const { token } = req.query;
-  if (!token) return res.status(400).json({ error: 'Token ausente' });
+app.post('/api/verify-whatsapp', (req, res) => {
+  const { email, whatsapp, code } = req.body || {};
+  const codeStr = String(code || '').trim();
+
+  if (!codeStr || codeStr.length !== 6) {
+    return res.status(400).json({ error: 'Informe o código de 6 dígitos' });
+  }
 
   const users = readUsers();
-  const idx = users.findIndex(u => u.verificationToken === token);
+  let idx = -1;
+
+  if (email) {
+    idx = users.findIndex(u => u.email === String(email).trim().toLowerCase());
+  } else if (whatsapp) {
+    const wa = onlyDigits(whatsapp);
+    idx = users.findIndex(u => onlyDigits(u.whatsapp) === wa);
+  }
 
   if (idx === -1) {
-    return res.status(400).json({ error: 'Link inválido ou já utilizado' });
+    return res.status(404).json({ error: 'Conta não encontrada' });
   }
 
   const user = users[idx];
-  if (user.emailVerified) {
-    return res.json({ ok: true, message: 'E-mail já estava confirmado', already: true });
+
+  if (isVerified(user)) {
+    return res.json({ ok: true, message: 'Conta já confirmada', already: true });
   }
 
   if (user.verificationExpires && new Date(user.verificationExpires) < new Date()) {
-    return res.status(400).json({ error: 'Link expirado. Faça um novo cadastro ou solicite reenvio.' });
+    return res.status(400).json({ error: 'Código expirado. Solicite um novo.' });
   }
 
+  if (String(user.verificationCode) !== codeStr) {
+    return res.status(400).json({ error: 'Código incorreto' });
+  }
+
+  users[idx].whatsappVerified = true;
   users[idx].emailVerified = true;
-  users[idx].verificationToken = null;
+  users[idx].verificationCode = null;
   users[idx].verificationExpires = null;
   writeUsers(users);
 
   res.json({
     ok: true,
-    message: 'E-mail confirmado com sucesso!',
-    email: user.email,
-    name: user.name
+    message: 'WhatsApp confirmado! Você já pode entrar.',
+    name: user.name,
+    email: user.email
   });
 });
 
-// Reenviar e-mail de confirmação
 app.post('/api/resend-verification', async (req, res) => {
   try {
-    const { email } = req.body || {};
-    if (!email) return res.status(400).json({ error: 'Informe o e-mail' });
-
+    const { email, whatsapp } = req.body || {};
     const users = readUsers();
-    const idx = users.findIndex(u => u.email === email.trim().toLowerCase());
-    if (idx === -1) return res.status(404).json({ error: 'E-mail não encontrado' });
+    let idx = -1;
 
-    const user = users[idx];
-    if (user.emailVerified) {
-      return res.json({ ok: true, message: 'Este e-mail já está confirmado' });
+    if (email) {
+      idx = users.findIndex(u => u.email === String(email).trim().toLowerCase());
+    } else if (whatsapp) {
+      const wa = onlyDigits(whatsapp);
+      idx = users.findIndex(u => onlyDigits(u.whatsapp) === wa);
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
-    users[idx].verificationToken = token;
-    users[idx].verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    if (idx === -1) return res.status(404).json({ error: 'Conta não encontrada' });
+
+    const user = users[idx];
+    if (isVerified(user)) {
+      return res.json({ ok: true, message: 'Conta já está confirmada' });
+    }
+
+    const code = generateCode();
+    users[idx].verificationCode = code;
+    users[idx].verificationExpires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
     writeUsers(users);
 
-    const emailResult = await sendVerificationEmail(user.email, user.name, token);
+    const sendResult = await sendWhatsAppCode(user.whatsapp, user.name, code);
+
     res.json({
       ok: true,
-      message: 'E-mail de confirmação reenviado',
-      ...(emailResult?.simulated ? { simulated: true, verificationToken: token } : {})
+      message: sendResult.simulated
+        ? 'Novo código gerado (modo simulado)'
+        : 'Código reenviado no WhatsApp',
+      ...(sendResult.simulated ? { simulated: true, code } : {})
     });
   } catch (err) {
     console.error(err);
-    res.status(502).json({ error: 'Falha ao reenviar e-mail', detail: err.message });
+    res.status(502).json({ error: 'Falha ao reenviar código', detail: err.message });
   }
 });
 
-// Login (exige e-mail verificado, exceto admin)
 app.post('/api/login', (req, res) => {
   const { loginId, password } = req.body || {};
   if (!loginId || !password) {
@@ -345,21 +358,14 @@ app.post('/api/login', (req, res) => {
 
   const users = readUsers();
   const id = String(loginId).trim();
-  const user = users.find(u =>
-    u.email.toLowerCase() === id.toLowerCase() ||
-    u.cpf.replace(/\D/g, '') === id.replace(/\D/g, '')
+  const user = users.find(
+    u =>
+      u.email.toLowerCase() === id.toLowerCase() ||
+      onlyDigits(u.cpf) === onlyDigits(id)
   );
 
   if (!user || user.password !== password) {
     return res.status(401).json({ error: 'CPF/e-mail ou senha incorretos' });
-  }
-
-  if (!user.emailVerified && user.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Confirme seu e-mail antes de entrar',
-      needsVerification: true,
-      email: user.email
-    });
   }
 
   res.json({
@@ -371,12 +377,28 @@ app.post('/api/login', (req, res) => {
       cpf: user.cpf,
       whatsapp: user.whatsapp,
       role: user.role || 'user',
-      emailVerified: !!user.emailVerified
+      whatsappVerified: true
     }
   });
 });
 
-// Fallback SPA / páginas
+// Lista de usuários para o painel admin (sem senhas)
+app.get('/api/admin/users', (req, res) => {
+  const users = readUsers().map(u => ({
+    id: u.id,
+    name: u.name,
+    cpf: u.cpf,
+    email: u.email,
+    whatsapp: u.whatsapp,
+    role: u.role || 'user',
+    whatsappVerified: !!(u.whatsappVerified || u.emailVerified),
+    emailVerified: !!u.emailVerified,
+    createdAt: u.createdAt,
+    loans: u.loans || []
+  }));
+  res.json({ ok: true, users });
+});
+
 app.get('*', (req, res) => {
   const file = path.join(FRONTEND_DIR, req.path === '/' ? 'index.html' : req.path);
   if (fs.existsSync(file) && fs.statSync(file).isFile()) {
@@ -385,13 +407,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
 });
 
-// ========== Start ==========
 ensureDataFile();
 app.listen(PORT, () => {
+  const provider = whatsappConfigured();
   console.log('');
   console.log('  NU Empréstimo — servidor rodando');
   console.log(`  → http://localhost:${PORT}`);
-  console.log(`  → Brevo API: ${BREVO_API_KEY && BREVO_API_KEY !== 'cole_sua_chave_aqui' ? 'CONFIGURADA ✓' : 'NÃO configurada (modo simulado)'}`);
-  console.log(`  → Remetente: ${BREVO_SENDER_EMAIL}`);
+  console.log(`  → WhatsApp: ${provider ? provider.toUpperCase() + ' ✓' : 'modo simulado (sem API)'}`);
   console.log('');
 });
