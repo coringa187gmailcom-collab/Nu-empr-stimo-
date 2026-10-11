@@ -62,17 +62,18 @@
         </div>
 
         <div class="border-t border-slate-100 pt-5">
-          <p class="text-[13px] font-semibold text-slate-700 mb-4">Endereço (obrigatório)</p>
+          <p class="text-[13px] font-semibold text-slate-700 mb-4">Endereço</p>
           <div class="space-y-4">
             <div>
               <label class="block text-[13px] font-medium text-slate-600 mb-1.5">CEP</label>
               <input type="text" id="cep" required maxlength="9" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="00000-000" />
+              <p id="cepStatus" class="text-[12px] text-slate-400 mt-1.5 hidden"></p>
               <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
             </div>
             <div class="grid sm:grid-cols-3 gap-4">
               <div class="sm:col-span-2">
-                <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Rua / Logradouro</label>
-                <input type="text" id="rua" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="Rua, avenida..." />
+                <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Rua</label>
+                <input type="text" id="rua" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="Preenchido pelo CEP" />
                 <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
               </div>
               <div>
@@ -82,29 +83,13 @@
               </div>
             </div>
             <div>
-              <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Complemento (opcional)</label>
-              <input type="text" id="complemento" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="Apto, bloco..." />
-            </div>
-            <div class="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Bairro</label>
-                <input type="text" id="bairro" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="Bairro" />
-                <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
-              </div>
-              <div>
-                <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Cidade</label>
-                <input type="text" id="cidade" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="Cidade" />
-                <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
-              </div>
-            </div>
-            <div>
-              <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Estado (UF)</label>
-              <select id="uf" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50">
-                <option value="">Selecione</option>
-                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
-              </select>
+              <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Cidade</label>
+              <input type="text" id="cidade" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none bg-slate-50/50" placeholder="Preenchido pelo CEP" />
               <p class="error-msg hidden text-red-500 text-xs mt-1.5"></p>
             </div>
+            <input type="hidden" id="bairro" />
+            <input type="hidden" id="uf" />
+            <input type="hidden" id="complemento" />
           </div>
         </div>
 
@@ -184,6 +169,38 @@
     document.getElementById('parcelas').addEventListener('change', calcPreview);
     calcPreview();
 
+    document.getElementById('cep').addEventListener('input', function() {
+      let v = this.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
+      this.value = v;
+      if (v.replace(/\D/g, '').length === 8) buscarCep(v);
+    });
+
+    async function buscarCep(cep) {
+      const status = document.getElementById('cepStatus');
+      status.classList.remove('hidden', 'text-red-500', 'text-emerald-600');
+      status.classList.add('text-slate-400');
+      status.textContent = 'Buscando endereço...';
+      try {
+        const res = await fetch('https://viacep.com.br/ws/' + cep.replace(/\D/g, '') + '/json/');
+        const data = await res.json();
+        if (data.erro) {
+          status.classList.add('text-red-500');
+          status.textContent = 'CEP não encontrado. Preencha rua e cidade.';
+          return;
+        }
+        if (data.logradouro) document.getElementById('rua').value = data.logradouro;
+        if (data.localidade) document.getElementById('cidade').value = data.localidade;
+        if (data.bairro) document.getElementById('bairro').value = data.bairro;
+        if (data.uf) document.getElementById('uf').value = data.uf;
+        status.classList.add('text-emerald-600');
+        status.textContent = 'Endereço encontrado' + (data.bairro ? ' · ' + data.bairro + '/' + data.uf : '');
+      } catch {
+        status.classList.add('text-red-500');
+        status.textContent = 'Não foi possível buscar o CEP. Preencha manualmente.';
+      }
+    }
+
     document.getElementById('applyForm').addEventListener('submit', function(e) {
       e.preventDefault();
       clearErrors(this);
@@ -206,9 +223,7 @@
       if (cep.replace(/\D/g, '').length !== 8) { showError(document.getElementById('cep'), 'CEP inválido'); valid = false; }
       if (rua.length < 3) { showError(document.getElementById('rua'), 'Informe a rua'); valid = false; }
       if (!numero) { showError(document.getElementById('numero'), 'Informe o número'); valid = false; }
-      if (bairro.length < 2) { showError(document.getElementById('bairro'), 'Informe o bairro'); valid = false; }
       if (cidade.length < 2) { showError(document.getElementById('cidade'), 'Informe a cidade'); valid = false; }
-      if (!uf) { showError(document.getElementById('uf'), 'Selecione o estado'); valid = false; }
       if (!confirm) { alert('Você precisa autorizar a consulta de crédito.'); valid = false; }
       if (!valid) return;
 
