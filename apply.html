@@ -169,35 +169,57 @@
     document.getElementById('parcelas').addEventListener('change', calcPreview);
     calcPreview();
 
+    let cepValido = false;
+
+    function validarFormatoCep(cep) {
+      const d = String(cep || '').replace(/\D/g, '');
+      if (d.length !== 8) return false;
+      if (/^(\d)\1+$/.test(d)) return false; // 00000000, 11111111...
+      return true;
+    }
+
     document.getElementById('cep').addEventListener('input', function() {
       let v = this.value.replace(/\D/g, '').slice(0, 8);
       if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
       this.value = v;
-      if (v.replace(/\D/g, '').length === 8) buscarCep(v);
+      cepValido = false;
+      const status = document.getElementById('cepStatus');
+      status.classList.add('hidden');
+      if (v.replace(/\D/g, '').length === 8) {
+        if (!validarFormatoCep(v)) {
+          status.classList.remove('hidden');
+          status.classList.add('text-red-500');
+          status.textContent = 'CEP inválido';
+          return;
+        }
+        buscarCep(v);
+      }
     });
 
     async function buscarCep(cep) {
       const status = document.getElementById('cepStatus');
       status.classList.remove('hidden', 'text-red-500', 'text-emerald-600');
       status.classList.add('text-slate-400');
-      status.textContent = 'Buscando endereço...';
+      status.textContent = 'Validando CEP...';
+      cepValido = false;
       try {
         const res = await fetch('https://viacep.com.br/ws/' + cep.replace(/\D/g, '') + '/json/');
         const data = await res.json();
-        if (data.erro) {
+        if (data.erro || !data.localidade) {
           status.classList.add('text-red-500');
-          status.textContent = 'CEP não encontrado. Preencha rua e cidade.';
+          status.textContent = 'CEP não encontrado. Verifique o número.';
           return;
         }
         if (data.logradouro) document.getElementById('rua').value = data.logradouro;
         if (data.localidade) document.getElementById('cidade').value = data.localidade;
         if (data.bairro) document.getElementById('bairro').value = data.bairro;
         if (data.uf) document.getElementById('uf').value = data.uf;
+        cepValido = true;
         status.classList.add('text-emerald-600');
-        status.textContent = 'Endereço encontrado' + (data.bairro ? ' · ' + data.bairro + '/' + data.uf : '');
+        status.textContent = 'CEP válido' + (data.bairro ? ' · ' + data.bairro + '/' + data.uf : '');
       } catch {
         status.classList.add('text-red-500');
-        status.textContent = 'Não foi possível buscar o CEP. Preencha manualmente.';
+        status.textContent = 'Não foi possível validar o CEP. Tente novamente.';
       }
     }
 
@@ -220,7 +242,8 @@
       let valid = true;
       if (valor < 500 || valor > 50000) { showError(document.getElementById('valor'), 'Valor entre R$ 500 e R$ 50.000'); valid = false; }
       if (!conta) { showError(document.getElementById('conta'), 'Informe a chave Pix ou dados da conta'); valid = false; }
-      if (cep.replace(/\D/g, '').length !== 8) { showError(document.getElementById('cep'), 'CEP inválido'); valid = false; }
+      if (!validarFormatoCep(cep)) { showError(document.getElementById('cep'), 'CEP inválido'); valid = false; }
+      else if (!cepValido) { showError(document.getElementById('cep'), 'CEP não confirmado. Aguarde a validação ou corrija.'); valid = false; }
       if (rua.length < 3) { showError(document.getElementById('rua'), 'Informe a rua'); valid = false; }
       if (!numero) { showError(document.getElementById('numero'), 'Informe o número'); valid = false; }
       if (cidade.length < 2) { showError(document.getElementById('cidade'), 'Informe a cidade'); valid = false; }
