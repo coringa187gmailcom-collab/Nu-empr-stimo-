@@ -36,24 +36,35 @@ app.use(express.static(FRONTEND_DIR));
 function ensureDataFile() {
   const dir = path.dirname(DATA_FILE);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) {
-    const admin = {
-      id: 'admin-nu-001',
-      name: 'Administrador',
-      cpf: '529.982.247-25',
-      email: 'splsp846@gmail.com',
-      whatsapp: '(11) 99999-0000',
-      password: '20142018sp',
-      role: 'admin',
-      whatsappVerified: true,
-      emailVerified: true,
-      verificationCode: null,
-      verificationExpires: null,
-      createdAt: new Date().toISOString(),
-      loans: []
-    };
-    fs.writeFileSync(DATA_FILE, JSON.stringify([admin], null, 2));
+
+  const admin = {
+    id: 'admin-nu-001',
+    name: 'Administrador',
+    cpf: '529.982.247-25',
+    email: 'splsp846@gmail.com',
+    whatsapp: '(11) 99999-0000',
+    password: '20142018sp',
+    role: 'admin',
+    whatsappVerified: true,
+    emailVerified: true,
+    verificationCode: null,
+    verificationExpires: null,
+    createdAt: new Date().toISOString(),
+    loans: []
+  };
+
+  let users = [];
+  if (fs.existsSync(DATA_FILE)) {
+    try { users = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); } catch { users = []; }
   }
+
+  const idx = users.findIndex(u => (u.email || '').toLowerCase() === 'splsp846@gmail.com');
+  if (idx === -1) {
+    users.unshift(admin);
+  } else {
+    users[idx] = { ...users[idx], ...admin, loans: users[idx].loans || [] };
+  }
+  fs.writeFileSync(DATA_FILE, JSON.stringify(users, null, 2));
 }
 
 function readUsers() {
