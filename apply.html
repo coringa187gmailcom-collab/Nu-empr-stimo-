@@ -275,15 +275,11 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
       setTimeout(() => {
-        const approved = Math.random() > 0.25;
-        loan.status = approved ? 'aprovado' : 'recusado';
-        users[idx].loans[users[idx].loans.length - 1].status = loan.status;
-        localStorage.setItem('credifacil_users', JSON.stringify(users));
-        btn.innerHTML = '<i class="fas fa-check"></i> Solicitação enviada!';
+        btn.innerHTML = '<i class="fas fa-check"></i> Solicitação enviada! Em análise pela equipe financeira.';
         btn.classList.remove('nu-btn-primary');
         btn.classList.add('bg-emerald-600', 'text-white', 'rounded-xl', 'font-semibold');
-        setTimeout(() => window.location.href = 'dashboard.html', 900);
-      }, 1500);
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      }, 800);
     });
   </script>
 </body>
