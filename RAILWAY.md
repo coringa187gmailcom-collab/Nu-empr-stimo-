@@ -1,4 +1,4 @@
-# Deploy no Railway — NU Empréstimo
+# Deploy no Railway — CrediFácil
 
 ## Passo a passo (do zero)
 
@@ -48,7 +48,7 @@ No serviço → aba **Variables** → adicione:
 |----------|--------|
 | `BREVO_API_KEY` | sua chave da API Brevo |
 | `BREVO_SENDER_EMAIL` | e-mail verificado no Brevo |
-| `BREVO_SENDER_NAME` | `NU Empréstimo` |
+| `BREVO_SENDER_NAME` | `CrediFácil` |
 | `APP_URL` | a URL gerada no passo 4 (com `https://`) |
 
 O Railway define `PORT` automaticamente — **não precisa** criar essa variável.

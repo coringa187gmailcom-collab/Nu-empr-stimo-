@@ -1,5 +1,5 @@
 /**
- * NU Empréstimo — Backend
+ * CrediFácil — Backend
  * Confirmação por código via WhatsApp (Z-API / Evolution) ou modo simulado
  */
 
@@ -108,7 +108,7 @@ function whatsappConfigured() {
 async function sendWhatsAppCode(whatsapp, name, code) {
   const phone = toBrazilPhone(whatsapp);
   const text =
-    `*NU Empréstimo*\n\nOlá, ${name.split(' ')[0]}!\nSeu código de confirmação é:\n\n*${code}*\n\nVálido por 15 minutos. Não compartilhe.`;
+    `*CrediFácil*\n\nOlá, ${name.split(' ')[0]}!\nSeu código de confirmação é:\n\n*${code}*\n\nVálido por 15 minutos. Não compartilhe.`;
 
   const provider = whatsappConfigured();
 
@@ -411,7 +411,7 @@ ensureDataFile();
 app.listen(PORT, () => {
   const provider = whatsappConfigured();
   console.log('');
-  console.log('  NU Empréstimo — servidor rodando');
+  console.log('  CrediFácil — servidor rodando');
   console.log(`  → http://localhost:${PORT}`);
   console.log(`  → WhatsApp: ${provider ? provider.toUpperCase() + ' ✓' : 'modo simulado (sem API)'}`);
   console.log('');

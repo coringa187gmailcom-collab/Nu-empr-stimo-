@@ -1,4 +1,4 @@
-# NU Empréstimo — Confirmação de e-mail com Brevo
+# CrediFácil — Confirmação de e-mail com Brevo
 
 ## Passo a passo
 
@@ -24,7 +24,7 @@ Cole assim:
 ```
 BREVO_API_KEY=xkeysib-sua_chave_completa_aqui
 BREVO_SENDER_EMAIL=seu-email-verificado@gmail.com
-BREVO_SENDER_NAME=NU Empréstimo
+BREVO_SENDER_NAME=CrediFácil
 APP_URL=http://localhost:3000
 PORT=3000
 ```
