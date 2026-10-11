@@ -511,7 +511,7 @@ app.post('/api/reviews', (req, res) => {
   res.status(201).json({ ok: true, message: 'Opinião enviada! Obrigado.', review });
 });
 
-// Admin: salvar solicitação (com endereço) na ficha do usuário
+// Admin: salvar solicitação (com endereço) na ficha do usuário e notificar
 app.post('/api/admin/loan', (req, res) => {
   const { userId, email, loan } = req.body || {};
   if (!loan) return res.status(400).json({ error: 'Dados da solicitação ausentes' });
@@ -523,8 +523,38 @@ app.post('/api/admin/loan', (req, res) => {
   if (!users[idx].loans) users[idx].loans = [];
   users[idx].loans.push(loan);
   writeUsers(users);
+  notifyNewLoan(users[idx], loan).catch(e => console.error('Notif solicitação:', e.message));
   res.json({ ok: true });
 });
+
+async function notifyNewLoan(user, loan) {
+  const end = loan.endereco || {};
+  const endStr = [end.rua, end.numero, end.bairro, end.cidade, end.uf].filter(Boolean).join(', ');
+  const text =
+    `*Nova solicitação — CrediFácil*\n` +
+    `Nome: ${user.name}\n` +
+    `CPF: ${user.cpf}\n` +
+    `E-mail: ${user.email}\n` +
+    `WhatsApp: ${user.whatsapp}\n` +
+    `Valor: R$ ${Number(loan.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
+    `Parcelas: ${loan.parcelas}x de R$ ${Number(loan.parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
+    `Total: R$ ${Number(loan.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
+    `Pix/Conta: ${loan.conta || '—'}\n` +
+    `Endereço: ${endStr || '—'}\n` +
+    `CEP: ${end.cep || '—'}`;
+
+  const phone = toBrazilPhone(ADMIN_WHATSAPP);
+  if (ZAPI_INSTANCE && ZAPI_TOKEN && phone) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN;
+    const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE}/token/${ZAPI_TOKEN}/send-text`;
+    const r = await fetch(url, { method: 'POST', headers, body: JSON.stringify({ phone, message: text }) });
+    if (!r.ok) console.warn('[Z-API] notificação falhou', r.status);
+    else console.log('[Z-API] notificação de solicitação enviada');
+  } else {
+    console.log('[Notificação] Nova solicitação (sem Z-API):\n' + text);
+  }
+}
 
 // Admin: listar todas
 app.get('/api/admin/reviews', (req, res) => {
