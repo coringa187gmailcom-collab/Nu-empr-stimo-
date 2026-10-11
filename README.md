@@ -1,4 +1,4 @@
-# CrediFácil — Site de Empréstimos Moderno
+# CrediFácil — Crédito pessoal online
 
 Site completo e profissional de empréstimo pessoal com:
 
@@ -7,7 +7,7 @@ Site completo e profissional de empréstimo pessoal com:
 - Validação real de CPF (algoritmo oficial)
 - Login por CPF ou e-mail
 - Área do cliente (dashboard)
-- Solicitação de empréstimo com simulação
+- Solicitação de crédito com simulação
 - Persistência local (localStorage) para demonstração
 
 ## Como abrir
