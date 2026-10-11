@@ -94,7 +94,7 @@
       e.preventDefault();
       clearErrors(this);
       document.getElementById('apiError').classList.add('hidden');
-      document.getElementById('verifyHint').classList.add('hidden');
+      document.getElementById('verifyHint')?.classList.add('hidden');
 
       const loginId = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value;
@@ -122,8 +122,14 @@
           return;
         }
 
-        // Sessão no localStorage (compatível com dashboard/admin existentes)
         localStorage.setItem('credifacil_session', JSON.stringify(data.user));
+        try {
+          const users = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+          const i = users.findIndex(u => u.id === data.user.id || (u.email||'').toLowerCase() === (data.user.email||'').toLowerCase());
+          if (i === -1) users.push({ ...data.user, loans: [] });
+          else users[i] = { ...users[i], ...data.user, loans: users[i].loans || [] };
+          localStorage.setItem('credifacil_users', JSON.stringify(users));
+        } catch (e) {}
         window.location.href = data.user.role === 'admin' ? 'admin.html' : 'dashboard.html';
       } catch (err) {
         // Fallback: tenta login local (admin / usuários antigos no localStorage)
@@ -148,22 +154,6 @@
       }
     });
 
-    let pendingWhatsapp = '';
-    document.getElementById('resendFromLogin').addEventListener('click', async function() {
-      if (!pendingEmail && !pendingWhatsapp) return;
-      this.textContent = 'Enviando...';
-      try {
-        const res = await fetch(apiBase + '/api/resend-verification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: pendingEmail, whatsapp: pendingWhatsapp })
-        });
-        const data = await res.json();
-        this.textContent = res.ok ? (data.message || 'Código reenviado!') : (data.error || 'Erro ao reenviar');
-      } catch {
-        this.textContent = 'Erro ao reenviar';
-      }
-    });
   </script>
 </body>
 </html>

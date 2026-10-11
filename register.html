@@ -212,6 +212,11 @@
 
         if (data.user) {
           localStorage.setItem('credifacil_session', JSON.stringify(data.user));
+          const users = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
+          if (!users.some(u => u.id === data.user.id)) {
+            users.push({ ...data.user, password: password, loans: [], createdAt: new Date().toISOString() });
+            localStorage.setItem('credifacil_users', JSON.stringify(users));
+          }
         }
         document.getElementById('formCard').classList.add('hidden');
         document.getElementById('successCard').classList.remove('hidden');
