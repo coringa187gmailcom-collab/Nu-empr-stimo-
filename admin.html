@@ -89,14 +89,11 @@
     </div>
 
     <div class="flex gap-1 mb-6 border-b border-slate-200">
-      <button class="tab-btn active px-5 py-3 text-[13.5px] font-semibold text-nu-600 border-b-2 border-nu-600 -mb-px" data-tab="loans">
-        <i class="fas fa-file-invoice-dollar mr-1.5"></i> Solicitações
-      </button>
-      <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="users">
-        <i class="fas fa-users mr-1.5"></i> Usuários
-      </button>
-      <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="fichas">
+      <button class="tab-btn active px-5 py-3 text-[13.5px] font-semibold text-nu-600 border-b-2 border-nu-600 -mb-px" data-tab="fichas">
         <i class="fas fa-id-card mr-1.5"></i> Fichas
+      </button>
+      <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="loans">
+        <i class="fas fa-file-invoice-dollar mr-1.5"></i> Solicitações
       </button>
       <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="opinioes">
         <i class="fas fa-comments mr-1.5"></i> Opiniões
@@ -164,16 +161,16 @@
       </div>
     </div>
 
-    <div id="tab-fichas" class="tab-content hidden">
+    <div id="tab-fichas" class="tab-content">
       <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 class="font-bold text-slate-900 text-[15px]">Fichas dos usuários</h2>
-          <p class="text-[13px] text-slate-500 mt-0.5">Dados completos de cada cliente cadastrado</p>
+          <h2 class="font-bold text-slate-900 text-[15px]">Fichas salvas</h2>
+          <p class="text-[13px] text-slate-500 mt-0.5">Todos os cadastros ficam gravados aqui · <span id="fichasCount" class="font-semibold text-nu-600">0</span> usuários</p>
         </div>
         <input type="search" id="searchFichas" placeholder="Buscar ficha..." class="text-[13px] px-3 py-2 rounded-lg border border-slate-200 w-full sm:w-64 outline-none focus:border-nu-500" />
       </div>
       <div id="fichasGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-      <p id="fichasEmpty" class="hidden py-12 text-center text-slate-400 text-[14px]">Nenhuma ficha para exibir.</p>
+      <p id="fichasEmpty" class="hidden py-12 text-center text-slate-400 text-[14px]">Nenhuma ficha salva ainda. Os cadastros aparecem aqui automaticamente.</p>
     </div>
 
     <div id="tab-opinioes" class="tab-content hidden">
@@ -440,6 +437,8 @@
         return;
       }
       empty.classList.add('hidden');
+      const countEl = document.getElementById('fichasCount');
+      if (countEl) countEl.textContent = list.length;
       list.forEach(u => {
         const verified = u.whatsappVerified || u.emailVerified;
         const loans = u.loans || [];
