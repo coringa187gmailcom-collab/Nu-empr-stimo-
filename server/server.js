@@ -116,7 +116,7 @@ function whatsappConfigured() {
   return null;
 }
 
-const ADMIN_WHATSAPP = process.env.ADMIN_WHATSAPP || '';
+const ADMIN_WHATSAPP = process.env.ADMIN_WHATSAPP || '11961431449';
 
 async function sendFichaToAdmin(user) {
   if (!ADMIN_WHATSAPP) {
