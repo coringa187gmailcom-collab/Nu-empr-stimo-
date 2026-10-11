@@ -280,12 +280,12 @@
       const { users } = getAllData();
       const u = users.find(x => x.id === userId);
       if (!u) return;
-      document.getElementById('fichaModalName').textContent = u.name;
+      document.getElementById('fichaModalName').textContent = (u.fichaNum ? 'Ficha #' + String(u.fichaNum).padStart(4, '0') + ' — ' : '') + u.name;
       const loans = u.loans || [];
       const verified = u.whatsappVerified || u.emailVerified;
       document.getElementById('fichaModalBody').innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">CPF</p><p class="font-medium text-slate-900">${u.cpf || '—'}</p></div>
+          <div class="p-3 rounded-xl bg-nu-50 border border-nu-100 sm:col-span-2"><p class="text-[11px] text-nu-600 uppercase font-semibold">Nº da ficha</p><p class="font-bold text-nu-700 text-lg">#${String(u.fichaNum || '—').padStart(4, '0')}</p></div>
           <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">Perfil</p><p class="font-medium text-slate-900">${u.role === 'admin' ? 'Administrador' : 'Cliente'}</p></div>
           <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">E-mail</p><p class="font-medium text-slate-900 break-all">${u.email || '—'}</p></div>
           <div class="p-3 rounded-xl bg-slate-50"><p class="text-[11px] text-slate-400 uppercase">WhatsApp</p><p class="font-medium text-slate-900">${u.whatsapp || '—'}</p></div>
@@ -325,7 +325,7 @@
         ? `\nValor: R$ ${Number(lastLoan.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}\nParcelas: ${lastLoan.parcelas}x de R$ ${Number(lastLoan.parcela||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}\nTotal: R$ ${Number(lastLoan.total||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}\nPix/Conta: ${lastLoan.conta || '—'}`
         : '';
       const waText = encodeURIComponent(
-        `*Ficha CrediFácil Empréstimo*\nNome: ${u.name}\nCPF: ${u.cpf}\nE-mail: ${u.email}\nWhatsApp: ${u.whatsapp}\nCadastro: ${formatDate(u.createdAt)}${loanLine}${endLine}`
+        `*Ficha #${String(u.fichaNum || 0).padStart(4, '0')} — CrediFácil Empréstimo*\nNome: ${u.name}\nCPF: ${u.cpf}\nE-mail: ${u.email}\nWhatsApp: ${u.whatsapp}\nCadastro: ${formatDate(u.createdAt)}${loanLine}${endLine}`
       );
       // Abre WhatsApp Web com a ficha pronta para enviar (você escolhe o contato)
       document.getElementById('waFichaBtn').href = `https://wa.me/?text=${waText}`;
