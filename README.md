@@ -1,68 +1,29 @@
-# CrediFácil — Site de Empréstimos Moderno
+# CrediFácil v1.0
 
-Site completo e profissional de empréstimo pessoal com:
+Plataforma de **correspondência/intermediação de crédito**. A CrediFácil não concede crédito diretamente; as propostas são analisadas por instituições financeiras autorizadas pelo Banco Central. Nenhuma taxa antecipada é cobrada.
 
-- Design moderno e responsivo (mobile-first)
-- Cadastro completo com **CPF**, **e-mail** e **WhatsApp**
-- Validação real de CPF (algoritmo oficial)
-- Login por CPF ou e-mail
-- Área do cliente (dashboard)
-- Solicitação de empréstimo com simulação
-- Persistência local (localStorage) para demonstração
-
-## Como abrir
-
-1. Abra a pasta `emprestimo-site`
-2. Clique duas vezes em `index.html`  
-   **ou**
-3. Use um servidor local (recomendado):
-
+## Rodar
 ```bash
-# Na pasta emprestimo-site
-npx serve .
-# ou
-python3 -m http.server 8080
+npm install
+ADMIN_EMAIL=... ADMIN_PASSWORD=... npm start   # http://localhost:3000
 ```
 
-Depois acesse `http://localhost:8080` (ou a porta indicada).
+## Variáveis de ambiente (Railway)
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `ADMIN_EMAIL` | sim | e-mail de login do painel `/admin.html` |
+| `ADMIN_PASSWORD` | sim | senha forte do painel (sem ela o admin fica desativado) |
+| `DATA_DIR` | recomendada | pasta persistente dos dados. No Railway, crie um **Volume** montado em `/data` (usado automaticamente) |
+| `CONTACT_EMAIL` | opcional | e-mail exibido em Privacidade/Termos (padrão: `ADMIN_EMAIL`) |
+
+Sem volume, os dados do Railway são apagados a cada deploy.
+
+## Segurança
+- Senhas com scrypt (contas antigas em texto puro são convertidas na inicialização)
+- Sessões em cookie HttpOnly + Secure + SameSite=Strict; checagem de origem nas APIs
+- Limite de tentativas em login, cadastro e admin
+- CSP e cabeçalhos de segurança; `/api/admin/*` e `admin.html` exigem login de admin
+- Validação de todos os campos no servidor; nenhum dado pessoal em logs
 
 ## Páginas
-
-| Arquivo          | Descrição                          |
-|------------------|------------------------------------|
-| `index.html`     | Landing page + simulador           |
-| `register.html`  | Cadastro (CPF, e-mail, WhatsApp)   |
-| `login.html`     | Login                              |
-| `dashboard.html` | Área do cliente                    |
-| `apply.html`     | Nova solicitação de empréstimo     |
-
-## Funcionalidades
-
-- Máscaras de CPF e telefone/WhatsApp
-- Validação de CPF com dígitos verificadores
-- Impede cadastro duplicado de CPF ou e-mail
-- Simulador de parcelas (taxa demonstrativa 2,49% a.m.)
-- Solicitação salva no “banco” local do navegador
-- Status simulado (em análise → aprovado/recusado)
-- Logout e proteção de rotas autenticadas
-
-## Observações importantes
-
-- Este é um **protótipo frontend completo**.
-- Não há backend real nem integração com bancos/birôs.
-- Os dados ficam apenas no `localStorage` do navegador.
-- Ideal para demonstração, apresentação ou base para um projeto real.
-
-## Próximos passos possíveis (produção)
-
-- Backend (Node.js, Laravel, Django, etc.)
-- Banco de dados
-- Autenticação JWT + hash de senha
-- Integração com API de CPF (Serpro, Receita)
-- Envio real de WhatsApp (Twilio, Z-API, etc.)
-- Consulta a birôs de crédito
-- HTTPS + conformidade LGPD completa
-
----
-
-© 2026 CrediFácil — Site demonstrativo.
+`/` início · `/cadastro.html` · `/login.html` · `/painel.html` · `/admin-login.html` · `/admin.html` · `/termos.html` · `/privacidade.html` · `/seguranca.html`

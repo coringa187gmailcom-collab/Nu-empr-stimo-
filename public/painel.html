@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minha conta | CrediFácil</title><meta name="description" content="CrediFácil — compare e solicite crédito com instituições financeiras autorizadas pelo Banco Central."><meta name="theme-color" content="#0B2545">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/styles.css"></head><body><nav class="nav"><div class="wrap"><a class="brand" href="/"><img src="/img/logo.svg" alt="" width="34" height="34"><span>Credi<b>Fácil</b></span></a>
+<div class="nav-links"><a href="/login.html" data-guest>Entrar</a><a class="btn btn-primary" href="/cadastro.html" data-guest>Cadastrar</a><a class="btn btn-primary hidden" href="/painel.html" data-auth>Minha conta</a></div></div></nav>
+<div class="notice" role="note"><div class="wrap"><span aria-hidden="true">ℹ️</span><span>A CrediFácil atua como correspondente/intermediadora e não concede crédito diretamente. As propostas são analisadas por instituições financeiras autorizadas pelo Banco Central.</span></div></div>
+<main class="form-wrap"><div id="loading" class="card">Carregando…</div><div id="app" class="hidden">
+<div class="card"><div class="toolbar"><h1 id="hello">Olá</h1><button class="btn btn-ghost btn-sm" id="logoutBtn" type="button">Sair</button></div>
+<div class="alert alert-info">Lembrete: a CrediFácil <strong>nunca</strong> cobra taxa para liberar crédito nem pede senha de banco ou códigos. <a href="/seguranca.html">Saiba mais</a>.</div>
+<div id="incomplete" class="alert alert-err hidden">Seu cadastro está incompleto. Complete-o para enviar uma proposta. <a href="/cadastro.html?completar=1">Completar cadastro</a></div>
+<h3>Minhas propostas</h3><div id="loans" class="small">Nenhuma proposta ainda.</div></div>
+<div class="card" id="loanCard"><h3>Nova proposta</h3>
+<div id="formAlert" class="alert alert-err hidden" role="alert"></div><div id="okAlert" class="alert alert-ok hidden"></div>
+<form id="loanForm" novalidate><div class="row"><div class="field"><label for="amount">Valor (R$ 500 a 50.000)</label><input id="amount" name="amount" type="text" placeholder="5.000" inputmode="numeric" required><div class="err" data-err="amount"></div></div><div class="field"><label for="installments">Parcelas</label><select id="installments"><option>6</option><option selected>12</option><option>18</option><option>24</option><option>36</option><option>48</option></select><div class="err" data-err="installments"></div></div></div>
+<div class="sim-out"><span class="small">Parcela estimada*: </span><strong id="est">—</strong></div>
+<div class="field"><label for="purpose">Finalidade (opcional)</label><select id="purpose"><option value="">Selecione</option><option>Despesas pessoais</option><option>Quitação de dívidas</option><option>Reforma / casa</option><option>Veículo</option><option>Educação</option><option>Outros</option></select></div>
+<div class="field"><label for="pixKey">Chave PIX para receber o valor, se aprovado</label><input id="pixKey" name="pixKey" type="text" placeholder="CPF, e-mail, celular ou chave aleatória" required maxlength="100"><div class="err" data-err="pixKey"></div></div>
+<p class="small">A chave PIX serve <strong>apenas como destino</strong> do depósito feito pela instituição financeira caso a proposta seja aprovada. Você não paga nada.</p>
+<label class="check"><input type="checkbox" id="declaration"> <span>Declaro que as informações são verdadeiras e autorizo o encaminhamento desta proposta e a consulta de crédito pela instituição financeira parceira.</span></label><div class="err" data-err="declaration"></div>
+<button class="btn btn-primary" type="submit" id="loanBtn">Enviar proposta para análise</button>
+<p class="small">*Estimativa com taxa de referência de 2,49% a.m.; taxa, CET e aprovação são definidos pela instituição financeira.</p></form></div>
+<div class="card"><h3>Meus dados</h3><div class="ficha"><dl id="myData"></dl></div></div></div></main><footer class="footer"><div class="wrap"><div class="cols">
+<div><a class="brand" href="/"><img src="/img/logo.svg" alt="" width="30" height="30"><span>Credi<b>Fácil</b></span></a>
+<p>A CrediFácil atua como correspondente/intermediadora e não concede crédito diretamente. As propostas são analisadas por instituições financeiras autorizadas pelo Banco Central.</p><p><strong>A CrediFácil nunca cobra taxa antecipada</strong> e nunca pede senha de banco, códigos de verificação ou depósitos para liberar crédito.</p></div>
+<div><strong>Institucional</strong><ul><li><a href="/termos.html">Termos de Uso</a></li><li><a href="/privacidade.html">Política de Privacidade (LGPD)</a></li><li><a href="/seguranca.html">Segurança</a></li></ul></div>
+<div><strong>Atendimento</strong><ul><li><a href="/painel.html">Minha conta</a></li><li>E-mail: <a data-contact href="mailto:">—</a></li></ul></div></div>
+<div class="legal">© 2026 CrediFácil. Simulações são estimativas; taxas, valores e aprovação dependem exclusivamente da análise da instituição financeira parceira. Crédito sujeito a análise. Não há cobrança de qualquer valor para cadastro, análise ou liberação.</div></div></footer>
+<script src="/js/common.js"></script><script src="/js/forms.js"></script><script src="/js/painel.js"></script></body></html>

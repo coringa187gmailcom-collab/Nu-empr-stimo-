@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel administrativo | CrediFácil</title><meta name="description" content="CrediFácil — compare e solicite crédito com instituições financeiras autorizadas pelo Banco Central."><meta name="theme-color" content="#0B2545">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/styles.css"></head><body><nav class="nav"><div class="wrap"><a class="brand" href="/"><img src="/img/logo.svg" alt="" width="34" height="34"><span>Credi<b>Fácil</b></span></a>
+<div class="nav-links"><a href="/login.html" data-guest>Entrar</a><a class="btn btn-primary" href="/cadastro.html" data-guest>Cadastrar</a><a class="btn btn-primary hidden" href="/painel.html" data-auth>Minha conta</a></div></div></nav>
+<div class="notice" role="note"><div class="wrap"><span aria-hidden="true">ℹ️</span><span>A CrediFácil atua como correspondente/intermediadora e não concede crédito diretamente. As propostas são analisadas por instituições financeiras autorizadas pelo Banco Central.</span></div></div>
+<main class="wrap"><div class="card"><div class="toolbar"><h1>Clientes</h1><span class="badge" id="count">0</span>
+<input id="search" type="search" placeholder="Buscar por nome, CPF, e-mail, cidade…"><a class="btn btn-primary btn-sm" href="/api/admin/export.csv">Exportar CSV</a><button class="btn btn-ghost btn-sm" id="adminLogout" type="button">Sair</button></div>
+<div id="adminAlert" class="alert alert-err hidden"></div>
+<table class="table"><thead><tr><th>Cliente</th><th class="hm">CPF</th><th class="hm">Cidade/UF</th><th>Proposta</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></main>
+<div class="modal hidden" id="modal"><div class="card"><div class="toolbar"><h2 id="mName">Ficha</h2><button class="btn btn-ghost btn-sm" id="mClose" type="button">Fechar</button></div><div class="ficha" id="mBody"></div></div></div><footer class="footer"><div class="wrap"><div class="cols">
+<div><a class="brand" href="/"><img src="/img/logo.svg" alt="" width="30" height="30"><span>Credi<b>Fácil</b></span></a>
+<p>A CrediFácil atua como correspondente/intermediadora e não concede crédito diretamente. As propostas são analisadas por instituições financeiras autorizadas pelo Banco Central.</p><p><strong>A CrediFácil nunca cobra taxa antecipada</strong> e nunca pede senha de banco, códigos de verificação ou depósitos para liberar crédito.</p></div>
+<div><strong>Institucional</strong><ul><li><a href="/termos.html">Termos de Uso</a></li><li><a href="/privacidade.html">Política de Privacidade (LGPD)</a></li><li><a href="/seguranca.html">Segurança</a></li></ul></div>
+<div><strong>Atendimento</strong><ul><li><a href="/painel.html">Minha conta</a></li><li>E-mail: <a data-contact href="mailto:">—</a></li></ul></div></div>
+<div class="legal">© 2026 CrediFácil. Simulações são estimativas; taxas, valores e aprovação dependem exclusivamente da análise da instituição financeira parceira. Crédito sujeito a análise. Não há cobrança de qualquer valor para cadastro, análise ou liberação.</div></div></footer>
+<script src="/js/common.js"></script><script src="/js/admin.js"></script></body></html>

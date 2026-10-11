@@ -1,19 +1,16 @@
 {
-  "name": "nu-emprestimo",
+  "name": "credifacil",
   "version": "1.0.0",
-  "description": "NU Empréstimo — site + API de confirmação de e-mail",
+  "description": "CrediFácil — correspondente/intermediadora de crédito (não concede crédito diretamente)",
   "main": "server/server.js",
+  "private": true,
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "node server/server.js"
+    "start": "node server/server.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "uuid": "^10.0.0"
+    "express": "^4.21.0"
   }
 }
