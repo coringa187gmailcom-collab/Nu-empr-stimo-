@@ -270,6 +270,13 @@
       users[idx].loans.push(loan);
       localStorage.setItem('credifacil_users', JSON.stringify(users));
 
+      // Grava no servidor para o admin ver o endereço
+      fetch((window.location.origin) + '/api/admin/loan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: session.id, email: session.email, loan })
+      }).catch(() => {});
+
       const btn = this.querySelector('button[type="submit"]');
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';

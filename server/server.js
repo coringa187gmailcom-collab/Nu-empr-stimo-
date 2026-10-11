@@ -511,6 +511,21 @@ app.post('/api/reviews', (req, res) => {
   res.status(201).json({ ok: true, message: 'Opinião enviada! Obrigado.', review });
 });
 
+// Admin: salvar solicitação (com endereço) na ficha do usuário
+app.post('/api/admin/loan', (req, res) => {
+  const { userId, email, loan } = req.body || {};
+  if (!loan) return res.status(400).json({ error: 'Dados da solicitação ausentes' });
+  const users = readUsers();
+  let idx = -1;
+  if (userId) idx = users.findIndex(u => u.id === userId);
+  if (idx === -1 && email) idx = users.findIndex(u => (u.email || '').toLowerCase() === String(email).toLowerCase());
+  if (idx === -1) return res.status(404).json({ error: 'Usuário não encontrado' });
+  if (!users[idx].loans) users[idx].loans = [];
+  users[idx].loans.push(loan);
+  writeUsers(users);
+  res.json({ ok: true });
+});
+
 // Admin: listar todas
 app.get('/api/admin/reviews', (req, res) => {
   res.json({ ok: true, reviews: readReviews().slice().reverse() });

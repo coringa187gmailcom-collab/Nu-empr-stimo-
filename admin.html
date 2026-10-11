@@ -295,18 +295,30 @@
         </div>
         <div class="mt-4">
           <p class="text-[12px] font-semibold text-slate-500 uppercase mb-2">Solicitações (${loans.length})</p>
-          ${loans.length === 0 ? '<p class="text-slate-400 text-[13px]">Nenhuma solicitação.</p>' : loans.map(l => `
-            <div class="flex justify-between items-center py-2 border-b border-slate-100 text-[13px]">
-              <span>R$ ${Number(l.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})} · ${l.parcelas||'—'}x</span>
-              <span class="text-slate-500">${l.status || '—'}</span>
-            </div>`).join('')}
+          ${loans.length === 0 ? '<p class="text-slate-400 text-[13px]">Nenhuma solicitação.</p>' : loans.map(l => {
+            const end = l.endereco || {};
+            const endStr = [end.rua, end.numero, end.cidade, end.uf].filter(Boolean).join(', ') || '—';
+            return `
+            <div class="py-2 border-b border-slate-100 text-[13px]">
+              <div class="flex justify-between items-center">
+                <span class="font-medium">R$ ${Number(l.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})} · ${l.parcelas||'—'}x</span>
+                <span class="text-slate-500">${l.status || '—'}</span>
+              </div>
+              <p class="text-[12px] text-slate-500 mt-1">Endereço: ${endStr}${end.cep ? ' · CEP ' + end.cep : ''}</p>
+            </div>`;
+          }).join('')}
         </div>
         <a id="waFichaBtn" href="#" target="_blank" class="mt-5 w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-[14px] transition">
           <i class="fab fa-whatsapp"></i> Enviar ficha no WhatsApp
         </a>
       `;
+      const lastLoan = loans[loans.length - 1] || {};
+      const end = lastLoan.endereco || {};
+      const endLine = end.rua
+        ? `\nEndereço: ${[end.rua, end.numero, end.bairro, end.cidade, end.uf].filter(Boolean).join(', ')}\nCEP: ${end.cep || '—'}`
+        : '';
       const waText = encodeURIComponent(
-        `*Ficha CrediFácil*\nNome: ${u.name}\nCPF: ${u.cpf}\nE-mail: ${u.email}\nWhatsApp: ${u.whatsapp}\nCadastro: ${formatDate(u.createdAt)}`
+        `*Ficha CrediFácil Empréstimo*\nNome: ${u.name}\nCPF: ${u.cpf}\nE-mail: ${u.email}\nWhatsApp: ${u.whatsapp}\nCadastro: ${formatDate(u.createdAt)}${endLine}`
       );
       // Abre WhatsApp Web com a ficha pronta para enviar (você escolhe o contato)
       document.getElementById('waFichaBtn').href = `https://wa.me/?text=${waText}`;
