@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opiniões | CrediFácil</title>
+  <meta name="description" content="Deixe sua opinião sobre o CrediFácil. Avaliações e respostas da equipe." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    tailwind.config = { theme: { extend: { colors: { nu: { 50:'#F5F0FF',100:'#EDE5FF',500:'#9333EA',600:'#820AD1',700:'#6B00B3' } }, fontFamily: { sans: ['Inter','system-ui','sans-serif'] } } } }
+  </script>
+</head>
+<body class="bg-[#F7F7F8] text-slate-900 antialiased font-sans">
+  <nav class="nu-nav sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex justify-between h-[64px] items-center">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-nu-600 to-nu-800 flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-nu-600/25 tracking-tighter">CF</div>
+          <span class="text-[17px] font-bold tracking-tight text-slate-900">CrediFácil</span>
+        </a>
+        <div class="hidden md:flex items-center gap-7">
+          <a href="index.html" class="text-[13.5px] font-medium text-slate-500 hover:text-nu-600">Início</a>
+          <a href="blog.html" class="text-[13.5px] font-medium text-slate-500 hover:text-nu-600">Blog</a>
+          <a href="opinioes.html" class="text-[13.5px] font-medium text-nu-600">Opiniões</a>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <a href="login.html" class="text-[13.5px] font-semibold text-slate-700 hover:text-nu-600 px-3.5 py-2 rounded-xl">Entrar</a>
+          <a href="register.html" class="nu-btn-primary text-[13.5px] px-4 py-2.5">Abrir conta</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+    <div class="text-center mb-10">
+      <span class="inline-block text-[12px] font-semibold text-nu-600 uppercase tracking-wider mb-2">Opiniões</span>
+      <h1 class="text-3xl font-extrabold tracking-tight">Deixe sua opinião</h1>
+      <p class="mt-2 text-slate-500 text-[14.5px]">Conte como foi sua experiência com o CrediFácil. Respondemos por aqui.</p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-10">
+      <form id="reviewForm" class="space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Seu nome</label>
+            <input type="text" id="revName" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none" placeholder="Nome" />
+          </div>
+          <div>
+            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">E-mail (opcional)</label>
+            <input type="email" id="revEmail" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none" placeholder="seu@email.com" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Nota</label>
+          <div class="flex gap-1 text-2xl text-slate-300" id="stars">
+            <button type="button" data-star="1" class="hover:text-amber-400 transition">★</button>
+            <button type="button" data-star="2" class="hover:text-amber-400 transition">★</button>
+            <button type="button" data-star="3" class="hover:text-amber-400 transition">★</button>
+            <button type="button" data-star="4" class="hover:text-amber-400 transition">★</button>
+            <button type="button" data-star="5" class="hover:text-amber-400 transition">★</button>
+          </div>
+          <input type="hidden" id="revRating" value="5" />
+        </div>
+        <div>
+          <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Sua opinião</label>
+          <textarea id="revMessage" required rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-nu-500/30 focus:border-nu-500 outline-none" placeholder="Conte sua experiência..."></textarea>
+        </div>
+        <p id="revError" class="hidden text-red-500 text-sm"></p>
+        <p id="revOk" class="hidden text-emerald-600 text-sm font-medium"></p>
+        <button type="submit" id="revBtn" class="nu-btn-primary w-full py-3.5 text-[15px]">Enviar opinião</button>
+      </form>
+    </div>
+
+    <!-- Lista -->
+    <h2 class="font-bold text-lg text-slate-900 mb-4">Opiniões recentes</h2>
+    <div id="reviewsList" class="space-y-4"></div>
+    <p id="reviewsEmpty" class="text-center text-slate-400 py-8 hidden">Nenhuma opinião ainda. Seja o primeiro!</p>
+  </main>
+
+  <footer class="bg-slate-950 text-slate-400 py-10 mt-12">
+    <div class="max-w-3xl mx-auto px-4 text-center text-[12px] space-y-1">
+      <p>credi-facil Soluções Ltda. · CNPJ 17.770.708/0001-24</p>
+      <p><a href="mailto:credifacil@gmail.com" class="text-nu-400 hover:text-white">credifacil@gmail.com</a></p>
+      <p class="pt-2 text-slate-600">© 2026 CrediFácil</p>
+    </div>
+  </footer>
+
+  <script>
+    const API = window.location.origin;
+    let rating = 5;
+
+    document.querySelectorAll('#stars button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        rating = parseInt(btn.dataset.star);
+        document.getElementById('revRating').value = rating;
+        document.querySelectorAll('#stars button').forEach((b, i) => {
+          b.classList.toggle('text-amber-400', i < rating);
+          b.classList.toggle('text-slate-300', i >= rating);
+        });
+      });
+    });
+    document.querySelector('#stars button[data-star="5"]').click();
+
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('revError');
+      const ok = document.getElementById('revOk');
+      err.classList.add('hidden'); ok.classList.add('hidden');
+      const btn = document.getElementById('revBtn');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      try {
+        const res = await fetch(API + '/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('revName').value,
+            email: document.getElementById('revEmail').value,
+            rating,
+            message: document.getElementById('revMessage').value
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.error || 'Erro ao enviar'; err.classList.remove('hidden'); }
+        else {
+          ok.textContent = data.message || 'Opinião enviada!';
+          ok.classList.remove('hidden');
+          document.getElementById('reviewForm').reset();
+          rating = 5;
+          document.querySelector('#stars button[data-star="5"]').click();
+          loadReviews();
+        }
+      } catch { err.textContent = 'Erro de conexão'; err.classList.remove('hidden'); }
+      btn.disabled = false;
+      btn.textContent = 'Enviar opinião';
+    });
+
+    async function loadReviews() {
+      const box = document.getElementById('reviewsList');
+      const empty = document.getElementById('reviewsEmpty');
+      try {
+        const res = await fetch(API + '/api/reviews');
+        const data = await res.json();
+        const list = data.reviews || [];
+        box.innerHTML = '';
+        if (list.length === 0) { empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        list.forEach(r => {
+          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+          const date = new Date(r.createdAt).toLocaleDateString('pt-BR');
+          const el = document.createElement('div');
+          el.className = 'bg-white rounded-2xl border border-slate-100 p-5';
+          el.innerHTML = `
+            <div class="flex justify-between items-start gap-3 mb-2">
+              <div>
+                <p class="font-semibold text-slate-900">${r.name}</p>
+                <p class="text-amber-400 text-sm">${stars}</p>
+              </div>
+              <span class="text-[12px] text-slate-400">${date}</span>
+            </div>
+            <p class="text-slate-600 text-[14px] leading-relaxed">${r.message}</p>
+            ${r.reply ? `<div class="mt-4 pl-4 border-l-2 border-nu-200 text-[13.5px] text-slate-700"><p class="text-[11px] font-semibold text-nu-600 uppercase mb-1">Resposta CrediFácil</p>${r.reply}</div>` : ''}
+          `;
+          box.appendChild(el);
+        });
+      } catch { empty.classList.remove('hidden'); empty.textContent = 'Não foi possível carregar as opiniões.'; }
+    }
+    loadReviews();
+  </script>
+</body>
+</html>

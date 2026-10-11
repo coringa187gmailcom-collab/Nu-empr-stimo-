@@ -399,6 +399,68 @@ app.get('/api/admin/users', (req, res) => {
   res.json({ ok: true, users });
 });
 
+// ========== Opiniões / Reclamações ==========
+const REVIEWS_FILE = path.join(__dirname, 'data', 'reviews.json');
+
+function readReviews() {
+  try {
+    if (!fs.existsSync(REVIEWS_FILE)) return [];
+    return JSON.parse(fs.readFileSync(REVIEWS_FILE, 'utf8'));
+  } catch { return []; }
+}
+function writeReviews(list) {
+  const dir = path.dirname(REVIEWS_FILE);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(REVIEWS_FILE, JSON.stringify(list, null, 2));
+}
+
+// Público: listar opiniões
+app.get('/api/reviews', (req, res) => {
+  const list = readReviews().slice().reverse();
+  res.json({ ok: true, reviews: list });
+});
+
+// Público: enviar opinião
+app.post('/api/reviews', (req, res) => {
+  const { name, email, rating, message } = req.body || {};
+  if (!name || name.trim().length < 2) return res.status(400).json({ error: 'Informe seu nome' });
+  if (!message || message.trim().length < 10) return res.status(400).json({ error: 'Escreva sua opinião (mínimo 10 caracteres)' });
+  const r = Math.min(5, Math.max(1, parseInt(rating) || 5));
+
+  const review = {
+    id: uuidv4(),
+    name: name.trim(),
+    email: (email || '').trim().toLowerCase(),
+    rating: r,
+    message: message.trim(),
+    reply: null,
+    createdAt: new Date().toISOString(),
+    repliedAt: null
+  };
+  const list = readReviews();
+  list.push(review);
+  writeReviews(list);
+  res.status(201).json({ ok: true, message: 'Opinião enviada! Obrigado.', review });
+});
+
+// Admin: listar todas
+app.get('/api/admin/reviews', (req, res) => {
+  res.json({ ok: true, reviews: readReviews().slice().reverse() });
+});
+
+// Admin: responder
+app.post('/api/admin/reviews/:id/reply', (req, res) => {
+  const { reply } = req.body || {};
+  if (!reply || reply.trim().length < 2) return res.status(400).json({ error: 'Escreva a resposta' });
+  const list = readReviews();
+  const idx = list.findIndex(r => r.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Opinião não encontrada' });
+  list[idx].reply = reply.trim();
+  list[idx].repliedAt = new Date().toISOString();
+  writeReviews(list);
+  res.json({ ok: true, review: list[idx] });
+});
+
 app.get('*', (req, res) => {
   const file = path.join(FRONTEND_DIR, req.path === '/' ? 'index.html' : req.path);
   if (fs.existsSync(file) && fs.statSync(file).isFile()) {

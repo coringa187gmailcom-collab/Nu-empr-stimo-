@@ -98,6 +98,9 @@
       <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="fichas">
         <i class="fas fa-id-card mr-1.5"></i> Fichas
       </button>
+      <button class="tab-btn px-5 py-3 text-[13.5px] font-semibold text-slate-400 hover:text-slate-600 border-b-2 border-transparent -mb-px" data-tab="opinioes">
+        <i class="fas fa-comments mr-1.5"></i> Opiniões
+      </button>
     </div>
 
     <div id="tab-loans" class="tab-content">
@@ -171,6 +174,15 @@
       </div>
       <div id="fichasGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       <p id="fichasEmpty" class="hidden py-12 text-center text-slate-400 text-[14px]">Nenhuma ficha para exibir.</p>
+    </div>
+
+    <div id="tab-opinioes" class="tab-content hidden">
+      <div class="mb-4">
+        <h2 class="font-bold text-slate-900 text-[15px]">Opiniões dos usuários</h2>
+        <p class="text-[13px] text-slate-500 mt-0.5">Leia e responda as avaliações enviadas no site</p>
+      </div>
+      <div id="adminReviews" class="space-y-4"></div>
+      <p id="adminReviewsEmpty" class="hidden py-12 text-center text-slate-400 text-[14px]">Nenhuma opinião ainda.</p>
     </div>
   </main>
 
@@ -498,7 +510,65 @@
       renderLoans();
       renderUsers();
       renderFichas();
+      loadAdminReviews();
     })();
+
+    async function loadAdminReviews() {
+      const box = document.getElementById('adminReviews');
+      const empty = document.getElementById('adminReviewsEmpty');
+      if (!box) return;
+      try {
+        const res = await fetch((window.location.protocol === 'file:' ? 'http://localhost:3000' : window.location.origin) + '/api/admin/reviews');
+        const data = await res.json();
+        const list = data.reviews || [];
+        box.innerHTML = '';
+        if (list.length === 0) { empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        list.forEach(r => {
+          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+          const date = new Date(r.createdAt).toLocaleString('pt-BR');
+          const el = document.createElement('div');
+          el.className = 'nu-card p-5';
+          el.innerHTML = `
+            <div class="flex justify-between items-start gap-3 mb-2">
+              <div>
+                <p class="font-semibold text-slate-900">${r.name}</p>
+                <p class="text-amber-400 text-sm">${stars}</p>
+                ${r.email ? `<p class="text-[12px] text-slate-400">${r.email}</p>` : ''}
+              </div>
+              <span class="text-[12px] text-slate-400">${date}</span>
+            </div>
+            <p class="text-slate-600 text-[14px] mb-3">${r.message}</p>
+            ${r.reply ? `<div class="mb-3 pl-3 border-l-2 border-nu-200 text-[13px] text-slate-700"><strong class="text-nu-600">Sua resposta:</strong> ${r.reply}</div>` : ''}
+            <div class="flex gap-2">
+              <input type="text" placeholder="Responder..." class="flex-1 text-[13px] px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-nu-500" data-reply-input="${r.id}" value="${r.reply || ''}" />
+              <button type="button" class="px-4 py-2 rounded-lg bg-nu-600 text-white text-[13px] font-medium hover:bg-nu-700" data-reply-btn="${r.id}">Enviar</button>
+            </div>
+          `;
+          box.appendChild(el);
+        });
+        box.querySelectorAll('[data-reply-btn]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-reply-btn');
+            const input = box.querySelector(`[data-reply-input="${id}"]`);
+            const reply = input.value.trim();
+            if (!reply) return;
+            btn.disabled = true;
+            btn.textContent = '...';
+            try {
+              const res = await fetch((window.location.protocol === 'file:' ? 'http://localhost:3000' : window.location.origin) + '/api/admin/reviews/' + id + '/reply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reply })
+              });
+              if (res.ok) loadAdminReviews();
+              else btn.textContent = 'Erro';
+            } catch { btn.textContent = 'Erro'; }
+            btn.disabled = false;
+          });
+        });
+      } catch { empty.classList.remove('hidden'); empty.textContent = 'Não foi possível carregar as opiniões.'; }
+    }
   </script>
 </body>
 </html>
