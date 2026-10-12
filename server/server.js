@@ -16,7 +16,9 @@ const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data', 'users.json');
+// Pasta de dados: use volume do Railway (ex: DATA_DIR=/data) para não perder contas no deploy
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const DATA_FILE = path.join(DATA_DIR, 'users.json');
 const FRONTEND_DIR = path.join(__dirname, '..');
 
 const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`;
@@ -500,7 +502,7 @@ app.get('/api/admin/users', (req, res) => {
 });
 
 // ========== Opiniões / Reclamações ==========
-const REVIEWS_FILE = path.join(__dirname, 'data', 'reviews.json');
+const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
 
 function readReviews() {
   try {
