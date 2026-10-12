@@ -260,7 +260,7 @@ function assignFichaNumbers() {
     if (u.role === 'admin') return;
     if (!u.fichaNum) {
       u.fichaNum = next++;
-      if (u.fichaNum > 9999) u.fichaNum = 9999;
+      if (u.fichaNum > 1000) u.fichaNum = 1000;
       changed = true;
     }
   });
@@ -275,7 +275,7 @@ function nextFichaNum() {
     if (u.role !== 'admin' && u.fichaNum && u.fichaNum > max) max = u.fichaNum;
   });
   const n = max + 1;
-  return n > 9999 ? 9999 : n;
+  return n > 1000 ? 1000 : n;
 }
 
 app.post('/api/register', async (req, res) => {
