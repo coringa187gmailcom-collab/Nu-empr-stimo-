@@ -247,6 +247,37 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+function assignFichaNumbers() {
+  const users = readUsers();
+  let max = 0;
+  users.forEach(u => {
+    if (u.role === 'admin') return;
+    if (u.fichaNum && u.fichaNum > max) max = u.fichaNum;
+  });
+  let next = max + 1;
+  let changed = false;
+  users.forEach(u => {
+    if (u.role === 'admin') return;
+    if (!u.fichaNum) {
+      u.fichaNum = next++;
+      if (u.fichaNum > 9999) u.fichaNum = 9999;
+      changed = true;
+    }
+  });
+  if (changed) writeUsers(users);
+  return next;
+}
+
+function nextFichaNum() {
+  const users = readUsers();
+  let max = 0;
+  users.forEach(u => {
+    if (u.role !== 'admin' && u.fichaNum && u.fichaNum > max) max = u.fichaNum;
+  });
+  const n = max + 1;
+  return n > 9999 ? 9999 : n;
+}
+
 app.post('/api/register', async (req, res) => {
   try {
     const { name, cpf, email, whatsapp, password } = req.body || {};
@@ -284,38 +315,7 @@ app.post('/api/register', async (req, res) => {
       return res.status(409).json({ error: 'WhatsApp já cadastrado' });
     }
 
-function assignFichaNumbers() {
-  const users = readUsers();
-  let max = 0;
-  users.forEach(u => {
-    if (u.role === 'admin') return;
-    if (u.fichaNum && u.fichaNum > max) max = u.fichaNum;
-  });
-  let next = max + 1;
-  let changed = false;
-  users.forEach(u => {
-    if (u.role === 'admin') return;
-    if (!u.fichaNum) {
-      u.fichaNum = next++;
-      if (u.fichaNum > 9999) u.fichaNum = 9999;
-      changed = true;
-    }
-  });
-  if (changed) writeUsers(users);
-  return next;
-}
-
-function nextFichaNum() {
-  const users = readUsers();
-  let max = 0;
-  users.forEach(u => {
-    if (u.role !== 'admin' && u.fichaNum && u.fichaNum > max) max = u.fichaNum;
-  });
-  const n = max + 1;
-  return n > 9999 ? 9999 : n;
-}
-
-const newUser = {
+    const newUser = {
       id: uuidv4(),
       fichaNum: nextFichaNum(),
       name: name.trim(),
@@ -614,7 +614,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
 });
 
-ensureDataFile();
 ensureDataFile();
 assignFichaNumbers();
 app.listen(PORT, () => {
