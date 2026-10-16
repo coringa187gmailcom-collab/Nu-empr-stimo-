@@ -315,6 +315,9 @@
         <a id="waFichaBtn" href="#" target="_blank" class="mt-5 w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-[14px] transition">
           <i class="fab fa-whatsapp"></i> Enviar ficha no WhatsApp
         </a>
+        <button type="button" id="deleteFichaBtn" data-id="${u.id}" class="mt-3 w-full inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2.5 rounded-xl text-[14px] border border-red-200 transition">
+          <i class="fas fa-trash-alt"></i> Excluir ficha
+        </button>
       `;
       const lastLoan = loans[loans.length - 1] || {};
       const end = lastLoan.endereco || {};
@@ -329,6 +332,20 @@
       );
       // Abre WhatsApp Web com a ficha pronta para enviar (você escolhe o contato)
       document.getElementById('waFichaBtn').href = `https://wa.me/?text=${waText}`;
+      document.getElementById('deleteFichaBtn').addEventListener('click', async () => {
+        if (!confirm('Excluir esta ficha? Esta ação não pode ser desfeita.')) return;
+        const id = document.getElementById('deleteFichaBtn').getAttribute('data-id');
+        try {
+          const r = await fetch('/api/admin/users/' + id, { method: 'DELETE' });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || 'Erro ao excluir');
+          document.getElementById('fichaModal').classList.add('hidden');
+          await loadUsersFromApi();
+          renderFichas();
+        } catch (e) {
+          alert(e.message || 'Falha ao excluir ficha');
+        }
+      });
       document.getElementById('fichaModal').classList.remove('hidden');
     }
 

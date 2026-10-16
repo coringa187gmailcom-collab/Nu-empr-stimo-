@@ -501,6 +501,19 @@ app.get('/api/admin/users', (req, res) => {
   res.json({ ok: true, users });
 });
 
+// Admin: excluir ficha (usuário)
+app.delete('/api/admin/users/:id', (req, res) => {
+  const users = readUsers();
+  const idx = users.findIndex(u => u.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Usuário não encontrado' });
+  if ((users[idx].role || '') === 'admin' || (users[idx].email || '').toLowerCase() === 'splsp846@gmail.com') {
+    return res.status(403).json({ error: 'Não é possível excluir o administrador' });
+  }
+  users.splice(idx, 1);
+  writeUsers(users);
+  res.json({ ok: true });
+});
+
 // ========== Opiniões / Reclamações ==========
 const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
 
