@@ -249,6 +249,20 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+function purgeOldFichas() {
+  const users = readUsers();
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const kept = users.filter(u => {
+    if ((u.role || '') === 'admin' || (u.email || '').toLowerCase() === 'splsp846@gmail.com') return true;
+    const created = u.createdAt ? new Date(u.createdAt).getTime() : 0;
+    return created > cutoff;
+  });
+  if (kept.length !== users.length) {
+    writeUsers(kept);
+    console.log(`[Fichas] Removidas ${users.length - kept.length} fichas com mais de 48h`);
+  }
+}
+
 function assignFichaNumbers() {
   const users = readUsers();
   let max = 0;
@@ -631,6 +645,8 @@ app.get('*', (req, res) => {
 
 ensureDataFile();
 assignFichaNumbers();
+purgeOldFichas();
+setInterval(purgeOldFichas, 60 * 60 * 1000);
 app.listen(PORT, () => {
   const provider = whatsappConfigured();
   console.log('');
