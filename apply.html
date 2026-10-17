@@ -159,7 +159,7 @@
       const valor = parseFloat(document.getElementById('valor').value.replace(/\D/g, '')) || 0;
       const parcelas = parseInt(document.getElementById('parcelas').value) || 12;
       const taxa = 0.0249;
-      if (valor < 500) {
+      if (valor < 5000) {
         document.getElementById('previewParcela').textContent = '—';
         document.getElementById('previewTotal').textContent = '—';
         return;
@@ -248,7 +248,7 @@
       const cidade = document.getElementById('cidade').value.trim();
       const uf = document.getElementById('uf').value;
       let valid = true;
-      if (valor < 500 || valor > 50000) { showError(document.getElementById('valor'), 'Valor entre R$ 500 e R$ 50.000'); valid = false; }
+      if (valor < 5000 || valor > 50000) { showError(document.getElementById('valor'), 'Valor entre R$ 5.000 e R$ 50.000'); valid = false; }
       if (!conta) { showError(document.getElementById('conta'), 'Informe a chave Pix ou dados da conta'); valid = false; }
       if (!validarFormatoCep(cep)) { showError(document.getElementById('cep'), 'CEP inválido'); valid = false; }
       else if (!cepValido) { showError(document.getElementById('cep'), 'CEP não confirmado. Aguarde a validação ou corrija.'); valid = false; }

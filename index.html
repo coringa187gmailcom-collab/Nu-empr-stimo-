@@ -418,7 +418,8 @@
   <script src="js/app.js"></script>
   <script>
     function calcHero() {
-      const valor = parseFloat(document.getElementById('heroValor').value.replace(/\D/g, '')) || 5000;
+      let valor = parseFloat(document.getElementById('heroValor').value.replace(/\D/g, '')) || 5000;
+      if (valor < 5000) valor = 5000;
       const parcelas = parseInt(document.getElementById('heroParcelas').value) || 12;
       const taxa = 0.0249;
       const parcela = valor * (taxa * Math.pow(1 + taxa, parcelas)) / (Math.pow(1 + taxa, parcelas) - 1);
