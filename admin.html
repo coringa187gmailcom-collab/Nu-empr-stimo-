@@ -235,16 +235,8 @@
         const res = await fetch((window.location.protocol === 'file:' ? 'http://localhost:3000' : window.location.origin) + '/api/admin/users');
         if (!res.ok) return;
         const data = await res.json();
-        if (data.users && data.users.length) {
-          // Mescla API + localStorage (mantém loans locais se API não tiver)
-          const local = JSON.parse(localStorage.getItem('credifacil_users') || '[]');
-          const map = new Map();
-          local.forEach(u => map.set(u.id, u));
-          data.users.forEach(u => {
-            const prev = map.get(u.id);
-            map.set(u.id, { ...prev, ...u, loans: (u.loans && u.loans.length) ? u.loans : (prev?.loans || []) });
-          });
-          cachedUsers = Array.from(map.values());
+        if (Array.isArray(data.users)) {
+          cachedUsers = data.users;
           localStorage.setItem('credifacil_users', JSON.stringify(cachedUsers));
         }
       } catch (e) {
